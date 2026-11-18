@@ -1,8 +1,8 @@
 // MyHadithApp service worker: works offline, checks for a new version on every open.
-const CACHE = 'myhadith-v1';
+const CACHE = 'myhadith-v2';
 const CORE = [
   './', 'index.html', 'manifest.webmanifest',
-  'data/index.json', 'data/en.json', 'data/ur.json', 'data/ar.json',
+  'data/index.json', 'data/en.json', 'data/ur.json', 'data/ar.json', 'data/hi.json', 'fonts/indopak.woff2',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png',
   'fonts/nunito-latin-wght-normal.woff2', 'fonts/nunito-latin-ext-wght-normal.woff2',
   'fonts/fraunces-latin-wght-normal.woff2', 'fonts/fraunces-latin-ext-wght-normal.woff2',

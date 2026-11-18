@@ -37,6 +37,7 @@ def clean(s):
 
 info_en, ver_en, en = load('en')
 info_ur, ver_ur, ur = load('ur')
+info_hi, ver_hi, hi = load('hi')
 api = {str(x['id']): x for x in json.load(open(os.path.join(SRC, 'source/api/hadeeths-ar.json')))}
 
 out = []
@@ -58,10 +59,15 @@ for i, r in en.items():
     if u:
         item['ur'] = {'title': clean(u['title']), 'text': clean(u['hadith_text']), 'expl': clean(u['explanation']),
                       'ben': clean(u['benefits']), 'grade': clean(u['grade']), 'takhrij': clean(u['takhrij'])}
+    h = hi.get(i)
+    if h:
+        item['hi'] = {'title': clean(h['title']), 'text': clean(h['hadith_text']), 'expl': clean(h['explanation']),
+                      'ben': clean(h['benefits']), 'grade': clean(h['grade']), 'takhrij': clean(h['takhrij'])}
+    item['ref'] = a.get('reference', '')
     out.append(item)
 
 out.sort(key=lambda x: int(x['id']))
-meta = {'en': {'version': ver_en, 'info': info_en}, 'ur': {'version': ver_ur, 'info': info_ur}}
+meta = {'en': {'version': ver_en, 'info': info_en}, 'ur': {'version': ver_ur, 'info': info_ur}, 'hi': {'version': ver_hi, 'info': info_hi}}
 cats = {lang: json.load(open(os.path.join(SRC, f'source/api/categories/{lang}.json'))) for lang in ('en', 'ur')}
 json.dump({'meta': meta, 'cats': cats, 'items': out}, open(os.path.join(OUT, 'all.json'), 'w'), ensure_ascii=False)
 print(len(out), 'hadith;', sum('ur' in x for x in out), 'with Urdu;', ver_en, ver_ur)

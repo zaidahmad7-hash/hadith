@@ -42,6 +42,30 @@ THEMES = [
 ]
 
 import curation  # noqa: E402  (local module with hand-picked id lists)
+import re
+from hinglish import to_hinglish
+
+BOOK = {'b': 'صحيح البخاري', 'm': 'صحيح مسلم'}
+SEG = re.compile(r'(?:\s*[،,]?\s*و?\s*\(\s*[\d\s]+/\s*\d+\s*\)\s*\(([\d\s\-–,،]+)\))')
+
+
+def refs(text):
+    """Hadith numbers (Fuad Abdul-Baqi numbering) cited in HadeethEnc's reference list, when given."""
+    out = {}
+    for k, name in BOOK.items():
+        nums = []
+        for mm in re.finditer(re.escape(name), text or ''):
+            pos = mm.end()
+            while True:
+                s = SEG.match(text, pos)
+                if not s:
+                    break
+                nums += [int(x) for x in re.findall(r'\d+', s.group(1))]
+                pos = s.end()
+        if nums:
+            out[k] = sorted(set(nums))[:3]
+    return out
+
 
 themes_out = []
 item_out = []
@@ -73,7 +97,7 @@ for x in items:
     assigned[x['id']] = th
     item_out.append({'id': x['id'], 't': x['tier'], 'th': th, 's': sorted(set(subs), key=int),
                      'f': 1 if '4' in anc else 0, 'u': 1 if 'ur' in x else 0,
-                     'n': len(x['en']['text'])})
+                     'n': len(x['en']['text']), 'r': refs(x.get('ref', ''))})
 
 for key, roots, en, ur in THEMES:
     if key == 'society':
@@ -109,8 +133,8 @@ index = {
 json.dump(index, open(os.path.join(OUT, 'index.json'), 'w'), ensure_ascii=False, separators=(',', ':'))
 
 F = ('title', 'text', 'expl', 'ben', 'grade', 'takhrij')
-for lang in ('en', 'ur'):
-    d = {x['id']: [x[lang][k] for k in F] for x in items if lang in x}
+for lang in ('en', 'ur', 'hi'):
+    d = {x['id']: [(to_hinglish(x[lang][k]) if lang == 'hi' else x[lang][k]) for k in F] for x in items if lang in x}
     json.dump(d, open(os.path.join(OUT, f'{lang}.json'), 'w'), ensure_ascii=False, separators=(',', ':'))
 d = {x['id']: [x['ar']['title'], x['ar']['text']] for x in items}
 json.dump(d, open(os.path.join(OUT, 'ar.json'), 'w'), ensure_ascii=False, separators=(',', ':'))
