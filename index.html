@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#FBF7F1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#141318" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="MyHadithApp">
+<meta name="description" content="Read and understand the most authentic hadith of the Prophet ﷺ, with simple explanations.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<title>MyHadithApp</title>
+<style>
+@font-face{font-family:Nunito;src:url(fonts/nunito-latin-wght-normal.woff2) format("woff2");font-weight:200 1000;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:Nunito;src:url(fonts/nunito-latin-ext-wght-normal.woff2) format("woff2");font-weight:200 1000;font-display:swap;unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:Fraunces;src:url(fonts/fraunces-latin-wght-normal.woff2) format("woff2");font-weight:100 900;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:Fraunces;src:url(fonts/fraunces-latin-ext-wght-normal.woff2) format("woff2");font-weight:100 900;font-display:swap;unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:Amiri;src:url(fonts/amiri-arabic-400-normal.woff2) format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:Amiri;src:url(fonts/amiri-arabic-700-normal.woff2) format("woff2");font-weight:700;font-display:swap}
+@font-face{font-family:Nastaliq;src:url(fonts/noto-nastaliq-urdu-arabic-400-normal.woff2) format("woff2");font-weight:400 700;font-display:swap}
+
+:root{
+  --bg:#FBF7F1;--card:#FFFFFF;--soft:#F4EEE5;--text:#2B2730;--muted:#7C7484;--line:#EDE5DA;
+  --btn:#3B3150;--btnText:#FFF;--shadow:0 1px 2px rgba(60,40,30,.05),0 8px 24px rgba(60,40,30,.06);
+  --fs:17px;--ui:Nunito,Amiri,system-ui,-apple-system,sans-serif;--serif:Fraunces,Georgia,Amiri,serif;
+  --ar:Amiri,"Geeza Pro",serif;--ur:Nastaliq,"Noto Nastaliq Urdu",Amiri,serif;
+  --safeB:env(safe-area-inset-bottom,0px);--safeT:env(safe-area-inset-top,0px);
+}
+html[data-size="0"]{--fs:15.5px}html[data-size="2"]{--fs:19.5px}html[data-size="3"]{--fs:22px}
+html.dark{--bg:#141318;--card:#1E1C24;--soft:#26232D;--text:#F1ECF5;--muted:#A49CAE;--line:#2E2A35;--btn:#EDE6FF;--btnText:#1E1A2A;--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25)}
+
+/* theme colours: --c pastel surface, --ink strong text, --dot accent */
+.t-faith{--c:#ECE6FF;--ink:#4E3F99;--dot:#A796F5}
+.t-worship{--c:#DFF0FF;--ink:#2B6496;--dot:#86C1F2}
+.t-character{--c:#FFE6D9;--ink:#A0502B;--dot:#F7A57E}
+.t-dhikr{--c:#DDF5E8;--ink:#2B7553;--dot:#7FD1A8}
+.t-heart{--c:#FFF2C6;--ink:#86650D;--dot:#F2CF5B}
+.t-family{--c:#FFE2ED;--ink:#A33C66;--dot:#F49ABD}
+.t-quran{--c:#E5F1D8;--ink:#4C6B29;--dot:#A9CF7B}
+.t-seerah{--c:#FFEACF;--ink:#985912;--dot:#F5BC6B}
+.t-life{--c:#D8F3F2;--ink:#226E6C;--dot:#76CFCB}
+.t-society{--c:#EEE8E0;--ink:#6B5944;--dot:#C8B39A}
+html.dark .t-faith{--c:#2A2541;--ink:#CFC3FF}html.dark .t-worship{--c:#1D2C3D;--ink:#A9D3FA}
+html.dark .t-character{--c:#3A271F;--ink:#FFC2A5}html.dark .t-dhikr{--c:#1B3329;--ink:#A5E5C4}
+html.dark .t-heart{--c:#363017;--ink:#F7DF8E}html.dark .t-family{--c:#3A2230;--ink:#FFB8D3}
+html.dark .t-quran{--c:#26321C;--ink:#C6E3A2}html.dark .t-seerah{--c:#3A2C18;--ink:#FFD39C}
+html.dark .t-life{--c:#17312F;--ink:#9FE2DF}html.dark .t-society{--c:#2E2923;--ink:#E2D3BF}
+
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text)}
+body{font-family:var(--ui);font-size:var(--fs);line-height:1.55;-webkit-font-smoothing:antialiased;min-height:100vh;overscroll-behavior-y:none}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+a{color:inherit}
+.ar{font-family:var(--ar);direction:rtl;text-align:right;line-height:2.05;font-size:1.32em}
+.ur{font-family:var(--ur);direction:rtl;text-align:right;line-height:2.35;font-size:1.02em}
+html[lang="ur"] body{font-family:var(--ur)}
+html[lang="ur"] .uiur{line-height:2.1}
+
+#app{max-width:640px;margin:0 auto;padding:calc(var(--safeT) + 6px) 18px calc(var(--safeB) + 110px)}
+.top{display:flex;align-items:center;gap:10px;padding:8px 0 4px}
+.brand{display:flex;align-items:center;gap:9px;font-weight:800;font-size:1.06rem;letter-spacing:-.01em}
+.brand img{width:30px;height:30px;border-radius:9px}
+.sp{flex:1}
+.ib{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:var(--card);box-shadow:var(--shadow)}
+.ib svg{width:21px;height:21px}
+.ib.on{background:var(--btn);color:var(--btnText)}
+
+.hello{margin:16px 2px 14px}
+.hello h1{margin:0;font-family:var(--serif);font-weight:600;font-size:1.75rem;letter-spacing:-.02em;line-height:1.2}
+html[lang="ur"] .hello h1{font-family:var(--ur);font-size:1.5rem;line-height:1.9}
+.hello p{margin:2px 0 0;color:var(--muted);font-size:.86rem}
+
+.daily{position:relative;overflow:hidden;border-radius:28px;padding:20px 20px 18px;background:linear-gradient(140deg,#FFE3EE 0%,#ECE6FF 48%,#DCEFFF 100%);color:#2B2440;box-shadow:var(--shadow)}
+html.dark .daily{background:linear-gradient(140deg,#3A2232 0%,#2A2541 50%,#1D2C3D 100%);color:#F3EEFF}
+.daily .blob{position:absolute;border-radius:50%;filter:blur(2px);opacity:.55}
+.daily .lbl{display:inline-flex;align-items:center;gap:6px;font-size:.72rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;background:rgba(255,255,255,.65);padding:5px 10px;border-radius:99px}
+html.dark .daily .lbl{background:rgba(255,255,255,.1)}
+.daily .q{position:relative;font-family:var(--serif);font-size:1.38rem;line-height:1.38;font-weight:500;margin:14px 0 10px;letter-spacing:-.01em}
+.daily .q.urq{font-family:var(--ur);font-size:1.2rem;line-height:2.2}
+.daily .qa{position:relative;margin:0 0 8px;font-size:1.25rem;opacity:.85}
+.daily .foot{position:relative;display:flex;align-items:center;gap:10px;margin-top:12px}
+.go{display:inline-flex;align-items:center;gap:8px;background:var(--btn);color:var(--btnText);font-weight:800;font-size:.9rem;padding:11px 16px;border-radius:99px}
+html.dark .daily .go{background:#F3EEFF;color:#221B33}
+.go svg{width:16px;height:16px}
+
+.stats{display:flex;gap:10px;margin:14px 0 4px}
+.stat{flex:1;background:var(--card);border-radius:18px;padding:10px 12px;box-shadow:var(--shadow);display:flex;align-items:center;gap:9px;min-width:0}
+.stat i{font-style:normal;width:32px;height:32px;border-radius:11px;display:grid;place-items:center;font-size:1rem;flex:none}
+.stat b{display:block;font-size:1.05rem;line-height:1.1}
+.stat span{display:block;font-size:.7rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+h2.sec{font-size:1.02rem;margin:26px 2px 12px;font-weight:800;letter-spacing:-.01em;display:flex;align-items:baseline;gap:8px}
+h2.sec small{font-weight:600;color:var(--muted);font-size:.78rem}
+.cont{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:20px;padding:12px 14px;box-shadow:var(--shadow);text-align:start;width:100%}
+.cont .ic{width:42px;height:42px;border-radius:14px;background:var(--c);color:var(--ink);display:grid;place-items:center;flex:none}
+.cont .ic svg{width:22px;height:22px}
+.cont .tx{flex:1;min-width:0}
+.cont .tx b{display:block;font-size:.92rem}
+.cont .tx span{display:block;color:var(--muted);font-size:.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.paths{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.path{position:relative;overflow:hidden;border-radius:24px;padding:16px 14px 14px;text-align:start;min-height:168px;display:flex;flex-direction:column;box-shadow:var(--shadow)}
+.path.p-start{background:linear-gradient(160deg,#DDF5E8,#DFF0FF);color:#1F4A3C}
+.path.p-kids{background:linear-gradient(160deg,#FFF2C6,#FFE2ED);color:#7A3B2A}
+html.dark .path.p-start{background:linear-gradient(160deg,#1B3329,#1D2C3D);color:#CDEFE0}
+html.dark .path.p-kids{background:linear-gradient(160deg,#363017,#3A2230);color:#FFE0C9}
+.path .em{font-size:1.6rem;line-height:1}
+.path b{display:block;font-size:1.02rem;margin-top:10px;line-height:1.25}
+.path span{display:block;font-size:.76rem;opacity:.8;margin-top:3px;line-height:1.35}
+.path .bar{margin-top:auto;height:7px;border-radius:9px;background:rgba(255,255,255,.7);overflow:hidden}
+html.dark .path .bar{background:rgba(255,255,255,.12)}
+.path .bar i{display:block;height:100%;border-radius:9px;background:currentColor;opacity:.55}
+.path .pc{font-size:.72rem;font-weight:800;margin-top:6px;opacity:.8}
+
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{background:var(--c);color:var(--ink);border-radius:20px;padding:14px 13px 12px;text-align:start;display:flex;flex-direction:column;gap:8px;min-height:104px}
+.tile .ti{width:34px;height:34px;border-radius:12px;background:rgba(255,255,255,.65);display:grid;place-items:center}
+html.dark .tile .ti{background:rgba(255,255,255,.08)}
+.tile .ti svg{width:20px;height:20px}
+.tile b{font-size:.9rem;line-height:1.25}
+.tile small{font-size:.72rem;opacity:.75;margin-top:-4px}
+.tiers{display:flex;flex-direction:column;gap:10px}
+.tierc{display:flex;align-items:center;gap:12px;background:var(--card);border-radius:18px;padding:12px 14px;box-shadow:var(--shadow);text-align:start}
+.tierc .st{width:40px;height:40px;border-radius:13px;display:grid;place-items:center;font-size:1.1rem;flex:none}
+.tierc b{display:block;font-size:.92rem}.tierc span{display:block;font-size:.76rem;color:var(--muted)}
+.credit{margin:30px 4px 0;font-size:.74rem;color:var(--muted);text-align:center;line-height:1.5}
+.credit a{text-decoration:underline;text-underline-offset:2px}
+
+/* tab bar */
+.tabs{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--safeB) + 12px);display:flex;gap:4px;background:color-mix(in srgb,var(--card) 88%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);padding:6px;border-radius:24px;box-shadow:0 10px 30px rgba(40,30,60,.14);z-index:20}
+.tabs button{display:flex;align-items:center;gap:7px;padding:10px 16px;border-radius:18px;font-weight:800;font-size:.82rem;color:var(--muted)}
+.tabs button svg{width:20px;height:20px}
+.tabs button.on{background:var(--btn);color:var(--btnText)}
+.tabs.hide{display:none}
+
+/* list page */
+.lhead{border-radius:26px;background:var(--c);color:var(--ink);padding:18px 18px 16px;margin-top:8px}
+.lhead .ti{width:44px;height:44px;border-radius:15px;background:rgba(255,255,255,.65);display:grid;place-items:center}
+html.dark .lhead .ti{background:rgba(255,255,255,.08)}
+.lhead .ti svg{width:24px;height:24px}
+.lhead h1{margin:12px 0 2px;font-size:1.4rem;line-height:1.25;letter-spacing:-.02em}
+.lhead p{margin:0;font-size:.82rem;opacity:.8}
+.lhead .bar{margin-top:12px;height:7px;border-radius:9px;background:rgba(255,255,255,.7);overflow:hidden}
+html.dark .lhead .bar{background:rgba(255,255,255,.1)}
+.lhead .bar i{display:block;height:100%;background:var(--ink);opacity:.5;border-radius:9px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:12px 2px 4px;scrollbar-width:none;margin:0 -18px;padding-left:18px;padding-right:18px}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;padding:8px 13px;border-radius:99px;background:var(--card);box-shadow:var(--shadow);font-size:.8rem;font-weight:700;white-space:nowrap;color:var(--muted)}
+.chip.on{background:var(--btn);color:var(--btnText)}
+.rows{display:flex;flex-direction:column;gap:9px;margin-top:12px}
+.row{display:flex;gap:12px;align-items:flex-start;background:var(--card);border-radius:18px;padding:13px 14px;box-shadow:var(--shadow);text-align:start;width:100%}
+.row .n{flex:none;width:30px;height:30px;border-radius:10px;background:var(--c);color:var(--ink);display:grid;place-items:center;font-size:.76rem;font-weight:800}
+.row .n.done{background:var(--ink);color:var(--card)}
+.row .tx{flex:1;min-width:0}
+.row .tx b{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;font-weight:600;font-size:.93rem;line-height:1.45}
+.row .tx b.ur{font-weight:400;font-size:.95rem;line-height:2.1}
+.row .tx small{display:block;color:var(--muted);font-size:.72rem;margin-top:4px}
+.more{display:block;margin:14px auto 0;padding:11px 18px;border-radius:99px;background:var(--card);box-shadow:var(--shadow);font-weight:800;font-size:.85rem}
+.empty{text-align:center;color:var(--muted);padding:40px 20px;font-size:.92rem}
+.empty .big{font-size:2.4rem}
+
+.search{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:18px;padding:0 14px;box-shadow:var(--shadow);margin-top:10px}
+.search svg{width:19px;height:19px;color:var(--muted);flex:none}
+.search input{flex:1;border:0;background:none;font:inherit;font-size:1rem;color:var(--text);padding:14px 0;outline:none;min-width:0}
+
+/* reader */
+.rbar{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:8px;padding:calc(var(--safeT) + 6px) 0 8px;margin:calc(-1 * var(--safeT) - 6px) -18px 0;padding-left:18px;padding-right:18px;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.rbar .ctx{flex:1;min-width:0;text-align:center;font-size:.78rem;font-weight:800;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prog{height:5px;border-radius:9px;background:var(--line);overflow:hidden;margin:2px 0 14px}
+.prog i{display:block;height:100%;background:var(--dot);border-radius:9px;transition:width .3s}
+.rd{animation:in .28s ease}
+.rd.l{animation:inl .28s ease}.rd.r{animation:inr .28s ease}
+@keyframes in{from{opacity:0;transform:translateY(6px)}}
+@keyframes inl{from{opacity:0;transform:translateX(30px)}}
+@keyframes inr{from{opacity:0;transform:translateX(-30px)}}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.tag{font-size:.72rem;font-weight:800;padding:5px 10px;border-radius:99px;background:var(--c);color:var(--ink)}
+.tag.star{background:#FFF2C6;color:#7A5C0A}
+html.dark .tag.star{background:#3A3216;color:#F7DF8E}
+.key{background:var(--c);color:var(--ink);border-radius:26px;padding:20px 20px 18px;position:relative;overflow:hidden}
+.key .qm{position:absolute;top:-18px;right:12px;font-family:var(--serif);font-size:7rem;line-height:1;opacity:.12}
+.key .kar{margin:0 0 6px;font-size:1.45em;line-height:1.95}
+.key h1{position:relative;margin:0;font-family:var(--serif);font-weight:500;font-size:1.36em;line-height:1.38;letter-spacing:-.01em}
+.key h1.ur{font-family:var(--ur);font-size:1.18em;line-height:2.2;font-weight:400}
+.key h1+h1{margin-top:10px;padding-top:10px;border-top:1px dashed color-mix(in srgb,var(--ink) 30%,transparent)}
+.card{background:var(--card);border-radius:24px;padding:18px 18px 16px;margin-top:12px;box-shadow:var(--shadow)}
+.card h3{display:flex;align-items:center;gap:9px;margin:0 0 10px;font-size:.8rem;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+html[lang="ur"] .card h3{letter-spacing:0;font-size:.95rem}
+.card h3 i{width:26px;height:26px;border-radius:9px;background:var(--c);color:var(--ink);display:grid;place-items:center;font-style:normal;font-size:.85rem}
+.card p{margin:0 0 .8em}
+.card p:last-child{margin-bottom:0}
+.card .ar{margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.card .ar:last-child{border:0;margin:0;padding:0}
+.card .ur+.en,.card .en+.ur{margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.grade{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.grade span{font-size:.74rem;font-weight:700;color:var(--muted);background:var(--soft);padding:4px 9px;border-radius:8px}
+.lessons{list-style:none;margin:0;padding:0;counter-reset:l}
+.lessons li{counter-increment:l;position:relative;padding-inline-start:38px;margin-bottom:12px}
+.lessons li:last-child{margin-bottom:0}
+.lessons li::before{content:counter(l);position:absolute;inset-inline-start:0;top:1px;width:26px;height:26px;border-radius:9px;display:grid;place-items:center;font-size:.76rem;font-weight:800;font-family:var(--ui);background:var(--lc,#ECE6FF);color:#2B2440}
+.lessons li:nth-child(6n+1){--lc:#DFF0FF}.lessons li:nth-child(6n+2){--lc:#FFE6D9}.lessons li:nth-child(6n+3){--lc:#DDF5E8}.lessons li:nth-child(6n+4){--lc:#FFF2C6}.lessons li:nth-child(6n+5){--lc:#FFE2ED}.lessons li:nth-child(6n){--lc:#ECE6FF}
+.note{margin-top:12px;border-radius:18px;padding:12px 14px;background:var(--soft);font-size:.82rem;color:var(--muted);display:flex;gap:10px}
+.note i{font-style:normal}
+.src{display:flex;justify-content:center;gap:6px;margin:16px 0 0;font-size:.76rem;color:var(--muted)}
+.src a{text-decoration:underline;text-underline-offset:2px}
+.fold{width:100%;display:flex;align-items:center;justify-content:space-between;background:var(--card);border-radius:20px;padding:14px 18px;margin-top:12px;box-shadow:var(--shadow);font-weight:800;font-size:.88rem}
+.fold svg{width:18px;height:18px;transition:transform .2s}
+.fold.open svg{transform:rotate(180deg)}
+.rnav{position:fixed;left:0;right:0;bottom:0;z-index:20;padding:10px 16px calc(var(--safeB) + 12px);background:linear-gradient(to top,var(--bg) 70%,transparent)}
+.rnav .in{max-width:640px;margin:0 auto;display:flex;gap:10px;align-items:center}
+.rnav .nb{width:52px;height:52px;border-radius:18px;background:var(--card);box-shadow:var(--shadow);display:grid;place-items:center;flex:none}
+.rnav .nb:disabled{opacity:.35}
+.rnav .nb svg{width:22px;height:22px}
+.rnav .main{flex:1;height:52px;border-radius:18px;background:var(--btn);color:var(--btnText);font-weight:800;font-size:.95rem;display:flex;align-items:center;justify-content:center;gap:8px}
+.rnav .main.done{background:var(--c);color:var(--ink)}
+.rnav .main svg{width:19px;height:19px}
+
+/* kids */
+.kid{border-radius:30px;padding:26px 22px 22px;text-align:center;position:relative;overflow:hidden;color:#2B2440}
+.kid .dots{position:absolute;inset:0;pointer-events:none}
+.kid .dots span{position:absolute;border-radius:50%;opacity:.5}
+.kid h1{position:relative;font-family:var(--serif);font-weight:600;font-size:1.6em;line-height:1.35;margin:6px 0 0;letter-spacing:-.01em}
+.kid h1.ur{font-family:var(--ur);font-weight:400;font-size:1.35em;line-height:2.2}
+.kid .kar{position:relative;margin:0 0 8px;text-align:center;font-size:1.35em}
+.kid .num{position:relative;display:inline-block;background:rgba(255,255,255,.7);padding:5px 12px;border-radius:99px;font-weight:900;font-size:.78rem}
+.starbtn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;margin-top:14px;height:58px;border-radius:20px;font-weight:900;font-size:1.05rem;background:#FFD45C;color:#5B3F00;box-shadow:0 6px 0 #E5B536}
+.starbtn:active{transform:translateY(3px);box-shadow:0 3px 0 #E5B536}
+.starbtn.got{background:#DDF5E8;color:#2B7553;box-shadow:0 6px 0 #B3E3CA}
+.starrow{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;margin:14px 0 2px;font-size:1.05rem}
+.starrow span{opacity:.22}.starrow span.on{opacity:1}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:50;overflow:hidden}
+.confetti i{position:absolute;width:10px;height:10px;border-radius:3px;top:-12px;animation:fall 1.4s ease-in forwards}
+@keyframes fall{to{transform:translateY(105vh) rotate(540deg);opacity:.2}}
+
+/* sheet */
+.scrim{position:fixed;inset:0;background:rgba(20,15,30,.35);z-index:40;opacity:0;transition:opacity .2s}
+.scrim.on{opacity:1}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;background:var(--bg);border-radius:28px 28px 0 0;max-height:88vh;overflow:auto;padding:10px 18px calc(var(--safeB) + 24px);transform:translateY(100%);transition:transform .26s cubic-bezier(.2,.8,.2,1);max-width:640px;margin:0 auto}
+.sheet.on{transform:none}
+.sheet .grab{width:42px;height:5px;border-radius:9px;background:var(--line);margin:0 auto 14px}
+.sheet h2{margin:0 0 14px;font-size:1.2rem}
+.opt{background:var(--card);border-radius:18px;padding:14px;margin-bottom:10px;box-shadow:var(--shadow)}
+.opt label{display:block;font-size:.76rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:9px}
+html[lang="ur"] .opt label{text-transform:none;letter-spacing:0;font-size:.9rem}
+.seg{display:flex;background:var(--soft);border-radius:13px;padding:3px;gap:3px}
+.seg button{flex:1;padding:9px 6px;border-radius:10px;font-weight:800;font-size:.84rem;color:var(--muted)}
+.seg button.on{background:var(--card);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.about{font-size:.84rem;color:var(--muted);line-height:1.6}
+.about b{color:var(--text)}
+.about pre{white-space:pre-wrap;font-size:.7rem;background:var(--soft);padding:10px;border-radius:12px;direction:ltr;text-align:left;font-family:ui-monospace,monospace}
+.toast{position:fixed;left:50%;bottom:calc(var(--safeB) + 90px);transform:translateX(-50%) translateY(20px);background:var(--btn);color:var(--btnText);padding:10px 16px;border-radius:14px;font-weight:700;font-size:.85rem;opacity:0;transition:.25s;z-index:60;pointer-events:none}
+.toast.on{opacity:1;transform:translateX(-50%)}
+.loading{display:grid;place-items:center;height:70vh;color:var(--muted)}
+.loading .ring{width:38px;height:38px;border-radius:50%;border:4px solid var(--line);border-top-color:#A796F5;animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.splash{position:fixed;inset:0;z-index:100;background:var(--bg);display:grid;place-items:center;transition:opacity .4s}
+.splash img{width:96px;height:96px;border-radius:26px;animation:pop .7s cubic-bezier(.2,1.4,.4,1)}
+@keyframes pop{from{transform:scale(.6);opacity:0}}
+html[dir="rtl"] .flip{transform:scaleX(-1)}
+</style>
+</head>
+<body>
+<div class="splash" id="splash"><img src="icons/icon-192.png" alt=""></div>
+<div id="app"><div class="loading"><div class="ring"></div></div></div>
+<nav class="tabs hide" id="tabs"></nav>
+<div id="nav"></div>
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet"></div>
+<div class="toast" id="toast"></div>
+<script>
+'use strict';
+const VERSION = '1.0';
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ---------- icons (no living beings) ---------- */
+const I = {
+  search:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>',
+  gear:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>',
+  back:'<svg class="flip" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 5-7 7 7 7"/></svg>',
+  next:'<svg class="flip" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg>',
+  arrow:'<svg class="flip" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+  heart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>',
+  heartf:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>',
+  share:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
+  down:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>',
+  home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 11 12 4l8 7v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></svg>',
+  explore:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg>',
+  book:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 6c-2-1.5-5-2-8-1.5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5v-13c-3-.5-6 0-8 1.5zM12 6v13"/></svg>',
+  faith:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M14.5 4.5A7.5 7.5 0 1 0 19.5 17 6 6 0 0 1 14.5 4.5z"/><path d="m18 6 .7 1.5 1.6.2-1.2 1.1.3 1.6-1.4-.8-1.4.8.3-1.6-1.2-1.1 1.6-.2z" fill="currentColor" stroke-width="1"/></svg>',
+  worship:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3v2M7 12a5 5 0 0 1 10 0v8H7z"/><path d="M4 20h16M10 20v-3a2 2 0 0 1 4 0v3"/></svg>',
+  character:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>',
+  dhikr:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="4.5" r="1.6"/><circle cx="17.3" cy="6.7" r="1.6"/><circle cx="19.5" cy="12" r="1.6"/><circle cx="17.3" cy="17.3" r="1.6"/><circle cx="6.7" cy="17.3" r="1.6"/><circle cx="4.5" cy="12" r="1.6"/><circle cx="6.7" cy="6.7" r="1.6"/><path d="M12 18v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="17" r="1.6"/></svg>',
+  heartsoft:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3.5s6 6.5 6 10.5a6 6 0 0 1-12 0c0-4 6-10.5 6-10.5z"/><path d="M9.5 14.5a2.5 2.5 0 0 0 2.5 2.5" stroke-linecap="round"/></svg>',
+  family:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3.5 11 12 4l8.5 7"/><path d="M6 9.5V20h12V9.5"/><path d="M12 17s-3-1.8-3-4a1.6 1.6 0 0 1 3-.8 1.6 1.6 0 0 1 3 .8c0 2.2-3 4-3 4z"/></svg>',
+  quran:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 7c-2-1.5-5-2-8-1.5V18c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V5.5c-3-.5-6 0-8 1.5zM12 7v12.5"/><path d="M4 18 2.5 20.5M20 18l1.5 2.5" stroke-linecap="round"/></svg>',
+  seerah:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M12 3v2M9 5h6l1 3H8z"/><path d="M8 8h8v9a3 3 0 0 1-3 3h-2a3 3 0 0 1-3-3z"/><path d="M12 12v4"/></svg>',
+  life:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3.5" y="7.5" width="17" height="12" rx="2.5"/><path d="M9 7.5V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v1.5M3.5 13h17"/></svg>',
+  society:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M12 4v16M7 20h10M5 7h14"/><path d="m5 7-2.5 6a2.5 2.5 0 0 0 5 0zM19 7l-2.5 6a2.5 2.5 0 0 0 5 0z"/></svg>',
+};
+I.heart_t = I.heartsoft;
+const THEME_ICON = {faith:'faith',worship:'worship',character:'character',dhikr:'dhikr',heart:'heartsoft',family:'family',quran:'quran',seerah:'seerah',life:'life',society:'society'};
+
+/* ---------- strings ---------- */
+const T = {
+ en:{salam:'Assalamu alaikum',daily:'Hadith of the day',readU:'Read & understand',streak:'day streak',read:'read',stars:'stars',
+  cont:'Continue where you left off',journeys:'Journeys',start:'Start here',startS:'40 essential hadith every Muslim should know',
+  kids:'Little Learners',kidsS:'Short hadith for children, with stars to collect',themes:'Explore by theme',
+  strongest:'The most authentic',both:'Agreed upon',bothS:'Narrated by both al-Bukhari and Muslim',bukhari:'Sahih al-Bukhari',bukhariS:'Only in al-Bukhari',
+  muslim:'Sahih Muslim',muslimS:'Only in Muslim',hadith:'hadith',of:'of',home:'Today',explore:'Explore',saved:'Saved',all:'All',
+  theHadith:'The hadith',meaning:'What it means',lessons:'Lessons',markRead:'Mark as read',isRead:'Read',next:'Next',finish:'Finished!',
+  learnt:'I learnt this!',gotStar:'Star collected',fullFor:'The full hadith and its meaning',searchPh:'Search hadith…',
+  noSaved:'Tap the heart on any hadith to keep it here.',noRes:'No hadith found. Try another word.',
+  fiqh:'This hadith is about rulings (fiqh). The four Sunni schools sometimes understand such hadith differently. For practice, follow your madhhab or ask a scholar you trust.',
+  noUr:'Urdu translation is not available for this hadith yet, so it is shown in English.',
+  settings:'Settings',trans:'Translation',arabic:'Arabic text',show:'Show',hide:'Hide',size:'Text size',look:'Appearance',auto:'Auto',light:'Light',dark:'Dark',
+  lang:'App language',about:'About & sources',source:'Source',view:'View on HadeethEnc.com',copied:'Copied',saved1:'Saved',removed:'Removed',
+  shortest:'Shortest first',results:'results',done:'Well done! You finished this journey.',backHome:'Back to home',reset:'Reset progress',
+  resetQ:'Reset all reading progress, stars and saved hadith on this phone?',
+  aboutText:'<b>MyHadithApp</b> shows only hadith graded <b>Sahih (authentic)</b> and narrated by <b>al-Bukhari and/or Muslim</b>, the two most authentic hadith books. The hadith text, translations, explanations and lessons come from <b>HadeethEnc.com</b> (Encyclopedia of Translated Prophetic Hadiths) and are shown exactly as published, with no changes. The themes and the two journeys are arranged for this app. Your progress stays on this phone only. No ads, no tracking.',
+  updates:'Content versions',edit:'Spotted a mistake in a translation? Please report it to HadeethEnc.com.',share:'Share'},
+ ur:{salam:'السلام علیکم',daily:'آج کی حدیث',readU:'پڑھیں اور سمجھیں',streak:'دن مسلسل',read:'پڑھی گئیں',stars:'ستارے',
+  cont:'جہاں چھوڑا تھا وہیں سے',journeys:'سفر',start:'یہاں سے شروع کریں',startS:'۴۰ بنیادی احادیث جو ہر مسلمان کو معلوم ہونی چاہئیں',
+  kids:'ننھے طالب علم',kidsS:'بچوں کے لیے مختصر احادیث، ستارے جمع کریں',themes:'موضوعات',
+  strongest:'سب سے مستند',both:'متفق علیہ',bothS:'امام بخاری اور امام مسلم دونوں کی روایت',bukhari:'صحیح بخاری',bukhariS:'صرف بخاری میں',
+  muslim:'صحیح مسلم',muslimS:'صرف مسلم میں',hadith:'احادیث',of:'میں سے',home:'آج',explore:'تلاش',saved:'محفوظ',all:'سب',
+  theHadith:'حدیث',meaning:'مطلب',lessons:'اسباق',markRead:'پڑھ لی',isRead:'پڑھ لی ✓',next:'اگلی',finish:'مکمل!',
+  learnt:'میں نے سیکھ لیا!',gotStar:'ستارہ مل گیا',fullFor:'مکمل حدیث اور اس کا مطلب',searchPh:'حدیث تلاش کریں…',
+  noSaved:'کسی بھی حدیث پر دل کا نشان دبائیں، وہ یہاں محفوظ ہو جائے گی۔',noRes:'کوئی حدیث نہیں ملی۔ کوئی اور لفظ آزمائیں۔',
+  fiqh:'اس حدیث کا تعلق فقہی احکام سے ہے۔ چاروں سنی مکاتبِ فکر بعض اوقات ایسی احادیث کو مختلف انداز میں سمجھتے ہیں۔ عمل کے لیے اپنے مسلک کی پیروی کریں یا کسی معتبر عالم سے پوچھیں۔',
+  noUr:'اس حدیث کا اردو ترجمہ ابھی دستیاب نہیں، اس لیے انگریزی میں دکھائی جا رہی ہے۔',
+  settings:'ترتیبات',trans:'ترجمہ',arabic:'عربی متن',show:'دکھائیں',hide:'چھپائیں',size:'لکھائی کا سائز',look:'رنگ',auto:'خودکار',light:'ہلکا',dark:'گہرا',
+  lang:'ایپ کی زبان',about:'ایپ اور ماخذ',source:'ماخذ',view:'HadeethEnc.com پر دیکھیں',copied:'کاپی ہو گئی',saved1:'محفوظ ہو گئی',removed:'ہٹا دی گئی',
+  shortest:'مختصر پہلے',results:'نتائج',done:'ماشاء اللہ! آپ نے یہ سفر مکمل کر لیا۔',backHome:'واپس',reset:'پیش رفت صاف کریں',
+  resetQ:'اس فون پر پڑھنے کی پیش رفت، ستارے اور محفوظ احادیث صاف کر دیں؟',
+  aboutText:'<b>MyHadithApp</b> میں صرف وہ احادیث ہیں جو <b>صحیح</b> ہیں اور <b>امام بخاری اور/یا امام مسلم</b> نے روایت کی ہیں۔ حدیث کا متن، ترجمہ، شرح اور اسباق <b>HadeethEnc.com</b> (موسوعۃ الاحادیث النبویۃ المترجمۃ) سے لیے گئے ہیں اور بغیر کسی تبدیلی کے دکھائے گئے ہیں۔ آپ کی پیش رفت صرف اسی فون پر رہتی ہے۔ کوئی اشتہار نہیں۔',
+  updates:'مواد کے ورژن',edit:'ترجمے میں غلطی نظر آئے تو HadeethEnc.com کو اطلاع دیں۔',share:'شیئر کریں'}
+};
+let S; // state
+const t = k => (T[S.set.ui] || T.en)[k] ?? T.en[k] ?? k;
+
+/* ---------- state ---------- */
+const KEY = 'myhadith.v1';
+function load(){
+  let s = {};
+  try { s = JSON.parse(localStorage.getItem(KEY)) || {}; } catch(e) {}
+  s.read ||= {}; s.saved ||= []; s.stars ||= {}; s.days ||= [];
+  s.set = Object.assign({tr:'en', ar:true, size:1, look:'auto', ui:'en', kidsFull:false}, s.set || {});
+  return s;
+}
+let saveT;
+function save(){ clearTimeout(saveT); saveT = setTimeout(() => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} }, 150); }
+const today = () => { const d = new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); };
+function markRead(id){
+  if (!S.read[id]) S.read[id] = today();
+  if (!S.days.includes(today())) { S.days.push(today()); S.days = S.days.slice(-400); }
+  save();
+}
+function streak(){
+  const set = new Set(S.days); let n = 0; const d = new Date();
+  if (!set.has(today())) d.setDate(d.getDate()-1);
+  for(;;){ const k = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); if (set.has(k)) { n++; d.setDate(d.getDate()-1); } else break; }
+  return n;
+}
+
+/* ---------- data ---------- */
+let IDX, BY = {}, TH = {}, D = {en:null, ur:null, ar:null};
+const loaders = {};
+function getJSON(name){
+  return loaders[name] ||= fetch('data/'+name+'.json').then(r => { if(!r.ok) throw new Error(name); return r.json(); });
+}
+async function need(){
+  const want = ['en'];
+  if (S.set.tr !== 'en' || S.set.ui === 'ur') want.push('ur');
+  if (S.set.ar) want.push('ar');
+  await Promise.all(want.map(async k => { if (!D[k]) D[k] = await getJSON(k); }));
+}
+const tierOrder = {both:0, bukhari:1, muslim:2};
+
+/* text helpers: everything shown is the source's own text */
+const paras = s => String(s||'').split(/\n+/).map(x => x.trim()).filter(Boolean);
+function tx(id, lang){ const d = D[lang]; return d && d[id]; }   // [title,text,expl,ben,grade,takhrij]
+function langsFor(id){
+  const tr = S.set.tr;
+  if (tr === 'en') return ['en'];
+  if (tr === 'ur') return tx(id,'ur') ? ['ur'] : ['en'];
+  return tx(id,'ur') ? ['en','ur'] : ['en'];
+}
+function title1(id){ const l = (S.set.tr === 'ur' || (S.set.tr==='both' && S.set.ui==='ur')) && tx(id,'ur') ? 'ur' : 'en'; return {l, s: tx(id,l)[0]}; }
+function themeOf(id){ return (BY[id].th[0]) || 'society'; }
+function tierLabel(tier){ return tier === 'both' ? '★ ' + t('both') : t(tier); }
+
+/* ---------- lists ---------- */
+function listFor(type, key, q){
+  q = q || {};
+  if (type === 'path') return IDX.paths[key] || [];
+  if (type === 'saved') return S.saved.slice();
+  if (type === 'day') return [key];
+  if (type === 'search') return searchIds(q.q || '');
+  let arr = IDX.items;
+  if (type === 'theme') arr = arr.filter(i => i.th.includes(key));
+  if (type === 'tier') arr = arr.filter(i => i.t === key);
+  if (q.sub) arr = arr.filter(i => i.s.includes(q.sub));
+  if (q.tier) arr = arr.filter(i => i.t === q.tier);
+  // essentials first, then by sub-topic (biggest topics first), strongest grade, shortest
+  const rank = {}; if (type === 'theme' && TH[key]) TH[key].subs.forEach((s, n) => rank[s.id] = n);
+  const subRank = i => type === 'theme' ? Math.min(99, ...i.s.map(s => rank[s] ?? 99)) : 0;
+  const ess = new Set(IDX.paths.start.concat(IDX.paths.kids));
+  return arr.slice().sort((a,b) => ((ess.has(b.id)?1:0)-(ess.has(a.id)?1:0)) || (subRank(a)-subRank(b)) || (tierOrder[a.t]-tierOrder[b.t]) || (a.n-b.n)).map(i => i.id);
+}
+function listName(type, key){
+  if (type === 'path') return t(key);
+  if (type === 'theme') return TH[key] ? TH[key][S.set.ui === 'ur' ? 'ur' : 'en'] : '';
+  if (type === 'tier') return t(key);
+  if (type === 'saved') return t('saved');
+  if (type === 'day') return t('daily');
+  if (type === 'search') return t('explore');
+  return '';
+}
+const norm = s => String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ًͯ-ٰٟۖ-ۭـ]/g,'').replace(/[‘’ʿʾ`']/g,'');
+let SIX = null;
+function searchIds(q){
+  q = norm(q).trim(); if (q.length < 2) return [];
+  if (!SIX) {
+    SIX = IDX.items.map(i => {
+      const parts = [];
+      for (const l of ['en','ur']) { const r = tx(i.id,l); if (r) parts.push(r[0], r[1]); }
+      const a = tx(i.id,'ar'); if (a) parts.push(a[1]);
+      return [i.id, norm(parts.join(' '))];
+    });
+  }
+  const words = q.split(/\s+/);
+  const hits = [];
+  for (const [id, s] of SIX) if (words.every(w => s.includes(w))) hits.push(id);
+  return hits.sort((a,b) => (tierOrder[BY[a].t]-tierOrder[BY[b].t]) || (BY[a].n - BY[b].n));
+}
+
+/* ---------- routing ---------- */
+function parse(){
+  const h = location.hash.replace(/^#\/?/, '');
+  const [path, qs] = h.split('?');
+  const parts = path.split('/').filter(Boolean).map(decodeURIComponent);
+  const q = Object.fromEntries(new URLSearchParams(qs || ''));
+  return {parts, q};
+}
+let depth = 0;
+const go = (h, replace) => { if (replace) location.replace('#/'+h); else { depth++; location.hash = '/'+h; } };
+const qstr = q => { const s = new URLSearchParams(Object.entries(q||{}).filter(([,v]) => v)).toString(); return s ? '?'+s : ''; };
+let lastDir = '';
+async function route(){
+  const {parts, q} = parse();
+  const v = parts[0] || '';
+  window.scrollTo(0, 0);
+  try { await need(); } catch(e) { $('#app').innerHTML = '<div class="empty"><div class="big">📶</div>Could not load the hadith. Please open the app once with internet.</div>'; return; }
+  if (v === 'read') return renderRead(parts[1], parts[2], parts[3], q);
+  if (v === 'list') return renderList(parts[1], parts[2], q);
+  if (v === 'explore') return renderExplore(q);
+  if (v === 'saved') return renderSaved();
+  return renderHome();
+}
+
+/* ---------- chrome ---------- */
+function tabs(active){
+  const el = $('#tabs');
+  if (!active) { el.classList.add('hide'); return; }
+  el.classList.remove('hide');
+  el.innerHTML = [['', 'home', 'home'], ['explore','explore','explore'], ['saved','heart','saved']].map(([h, ic, k]) =>
+    `<button class="${active===k?'on':''}" data-go="${h}">${I[ic]}<span>${t(k)}</span></button>`).join('');
+}
+function nav(html){ $('#nav').innerHTML = html || ''; }
+function header(){
+  return `<div class="top"><div class="brand"><img src="icons/icon-192.png" alt="">MyHadithApp</div><div class="sp"></div>
+    <button class="ib" data-go="explore?focus=1" aria-label="Search">${I.search}</button>
+    <button class="ib" data-act="settings" aria-label="Settings">${I.gear}</button></div>`;
+}
+
+/* ---------- home ---------- */
+function dayIndex(){ const d = new Date(); return Math.floor((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())) / 864e5); }
+function hijri(){
+  try { return new Intl.DateTimeFormat((S.set.ui==='ur'?'ur':'en-GB')+'-u-ca-islamic-umalqura', {day:'numeric', month:'long', year:'numeric'}).format(new Date()); } catch(e) { return ''; }
+}
+function pathProgress(key){ const ids = IDX.paths[key]; const n = ids.filter(i => key==='kids' ? S.stars[i] : S.read[i]).length; return [n, ids.length]; }
+function renderHome(){
+  tabs('home'); nav();
+  const pool = IDX.daily; const id = pool[dayIndex() % pool.length];
+  const ti = title1(id); const ar = S.set.ar && tx(id,'ar');
+  const [sn, st] = pathProgress('start'), [kn, kt] = pathProgress('kids');
+  const nRead = Object.keys(S.read).length, nStars = Object.keys(S.stars).length;
+  const g = new Date().toLocaleDateString(S.set.ui==='ur'?'ur':'en-GB', {weekday:'long', day:'numeric', month:'long'});
+  const last = S.last && BY[S.last.id] ? S.last : null;
+  let html = header();
+  html += `<div class="hello uiur"><h1>${t('salam')}</h1><p>${esc(g)}${hijri() ? ' · ' + esc(hijri()) : ''}</p></div>`;
+  html += `<button class="daily" data-go="read/day/${id}/${id}" style="width:100%;text-align:start">
+    <span class="blob" style="width:140px;height:140px;background:#fff;right:-40px;top:-50px"></span>
+    <span class="blob" style="width:90px;height:90px;background:#FFE6D9;left:-30px;bottom:-30px"></span>
+    <span class="lbl">☀︎ ${t('daily')}</span>
+    ${ar ? `<p class="qa ar">${esc(ar[0])}</p>` : ''}
+    <p class="q ${ti.l==='ur'?'urq':''}" ${ti.l==='ur'?'dir="rtl"':''}>“${esc(ti.s)}”</p>
+    <div class="foot"><span class="go">${t('readU')} ${I.arrow}</span><span style="font-size:.75rem;font-weight:700;opacity:.75">${esc(tierLabel(BY[id].t))}</span></div></button>`;
+  html += `<div class="stats">
+    <div class="stat"><i style="background:#FFE6D9">🔥</i><div><b>${streak()}</b><span>${t('streak')}</span></div></div>
+    <div class="stat"><i style="background:#DFF0FF">📖</i><div><b>${nRead}</b><span>${t('read')}</span></div></div>
+    <div class="stat"><i style="background:#FFF2C6">⭐</i><div><b>${nStars}</b><span>${t('stars')}</span></div></div></div>`;
+  if (last) {
+    const th = themeOf(last.id); const lt = title1(last.id);
+    html += `<h2 class="sec">${t('cont')}</h2><button class="cont t-${th}" data-go="${esc(last.h)}"><span class="ic">${I[THEME_ICON[th]]}</span>
+      <span class="tx"><b>${esc(listName(last.type, last.key))}</b><span class="${lt.l==='ur'?'ur':''}" style="${lt.l==='ur'?'line-height:1.9':''}">${esc(lt.s)}</span></span>${I.next.replace('<svg','<svg style="width:20px;height:20px;color:var(--muted)"')}</button>`;
+  }
+  html += `<h2 class="sec">${t('journeys')}</h2><div class="paths">
+    <button class="path p-start" data-go="list/path/start"><span class="em">🌱</span><b>${t('start')}</b><span>${t('startS')}</span><span style="height:12px"></span><span class="bar"><i style="width:${sn/st*100}%"></i></span><span class="pc">${sn} / ${st}</span></button>
+    <button class="path p-kids" data-go="list/path/kids"><span class="em">⭐</span><b>${t('kids')}</b><span>${t('kidsS')}</span><span style="height:12px"></span><span class="bar"><i style="width:${kn/kt*100}%"></i></span><span class="pc">${kn} / ${kt} ⭐</span></button></div>`;
+  html += `<h2 class="sec">${t('themes')} <small>${IDX.items.length} ${t('hadith')}</small></h2>` + themeGrid(6) +
+    `<button class="more" data-go="explore">${t('explore')} →</button>`;
+  html += credit();
+  $('#app').innerHTML = html;
+}
+function themeGrid(limit){
+  return '<div class="grid">' + IDX.themes.slice(0, limit || 99).map(th => `<button class="tile t-${th.key}" data-go="list/theme/${th.key}">
+    <span class="ti">${I[THEME_ICON[th.key]]}</span><b>${esc(th[S.set.ui==='ur'?'ur':'en'])}</b><small>${th.n} ${t('hadith')}</small></button>`).join('') + '</div>';
+}
+function credit(){
+  return `<p class="credit">Hadith text, translations and explanations from <a href="https://hadeethenc.com" target="_blank" rel="noopener">HadeethEnc.com</a>, shown unchanged.<br>MyHadithApp v${VERSION}</p>`;
+}
+
+/* ---------- explore ---------- */
+function renderExplore(q){
+  tabs('explore'); nav();
+  const counts = {both:0, bukhari:0, muslim:0}; IDX.items.forEach(i => counts[i.t]++);
+  let html = `<div class="top"><div class="brand" style="font-size:1.4rem">${t('explore')}</div><div class="sp"></div><button class="ib" data-act="settings">${I.gear}</button></div>
+    <label class="search">${I.search}<input id="sq" type="search" enterkeyhint="search" autocomplete="off" placeholder="${t('searchPh')}" value="${esc(q.q||'')}"></label>
+    <div id="sres"></div><div id="sbody">
+    <h2 class="sec">${t('strongest')}</h2><div class="tiers">
+      <button class="tierc" data-go="list/tier/both"><span class="st" style="background:#FFF2C6">★</span><span><b>${t('both')} · ${counts.both}</b><span>${t('bothS')}</span></span></button>
+      <button class="tierc" data-go="list/tier/bukhari"><span class="st" style="background:#DFF0FF">📘</span><span><b>${t('bukhari')} · ${counts.bukhari}</b><span>${t('bukhariS')}</span></span></button>
+      <button class="tierc" data-go="list/tier/muslim"><span class="st" style="background:#DDF5E8">📗</span><span><b>${t('muslim')} · ${counts.muslim}</b><span>${t('muslimS')}</span></span></button></div>
+    <h2 class="sec">${t('themes')}</h2>${themeGrid()}</div>`;
+  $('#app').innerHTML = html;
+  const inp = $('#sq'); let tm;
+  const run = () => {
+    const v = inp.value.trim();
+    history.replaceState(null, '', '#/explore' + qstr({q: v}));
+    if (v.length < 2) { $('#sres').innerHTML = ''; $('#sbody').style.display = ''; return; }
+    const ids = searchIds(v);
+    $('#sbody').style.display = 'none';
+    $('#sres').innerHTML = `<h2 class="sec">${ids.length} ${t('results')}</h2>` + (ids.length ? rows(ids.slice(0, 80), 'search', 's', {q:v}) : `<div class="empty"><div class="big">🔍</div>${t('noRes')}</div>`);
+  };
+  inp.addEventListener('input', () => { clearTimeout(tm); tm = setTimeout(run, 200); });
+  if (q.q) run();
+  if (q.focus) setTimeout(() => inp.focus(), 50);
+}
+function rows(ids, type, key, q, numbered){
+  return '<div class="rows">' + ids.map((id, n) => {
+    const it = BY[id]; const ti = title1(id); const th = themeOf(id);
+    const done = type === 'path' && key === 'kids' ? S.stars[id] : S.read[id];
+    return `<button class="row t-${th}" data-go="read/${type}/${key}/${id}${qstr(q)}"><span class="n ${done?'done':''}">${done ? '✓' : (numbered ? n+1 : '•')}</span>
+      <span class="tx"><b class="${ti.l==='ur'?'ur':''}" ${ti.l==='ur'?'dir="rtl"':''}>${esc(ti.s)}</b><small>${esc(tierLabel(it.t))}${S.saved.includes(id) ? ' · ♥' : ''}</small></span></button>`;
+  }).join('') + '</div>';
+}
+
+/* ---------- list ---------- */
+const PAGE = 40;
+function renderList(type, key, q){
+  tabs(null);
+  const ids = listFor(type, key, q);
+  const baseIds = type === 'theme' ? listFor(type, key, {}) : ids;
+  const readN = baseIds.filter(i => type==='path'&&key==='kids' ? S.stars[i] : S.read[i]).length;
+  const th = type === 'theme' ? key : type === 'path' ? (key === 'kids' ? 'heart' : 'dhikr') : type === 'tier' ? ({both:'heart', bukhari:'worship', muslim:'dhikr'}[key]) : 'faith';
+  const icon = type === 'theme' ? I[THEME_ICON[key]] : `<span style="font-size:1.4rem">${type==='path' ? (key==='kids'?'⭐':'🌱') : type==='tier' ? (key==='both'?'★':'📖') : '♥'}</span>`;
+  const sub = type === 'path' ? t(key+'S') : type === 'tier' ? t(key+'S') : '';
+  let html = `<div class="top"><button class="ib" data-back>${I.back}</button><div class="sp"></div><button class="ib" data-act="settings">${I.gear}</button></div>
+    <div class="lhead t-${th}"><span class="ti">${icon}</span><h1>${esc(listName(type, key))}</h1><p>${sub ? esc(sub) + ' · ' : ''}${readN} / ${baseIds.length} ${type==='path'&&key==='kids' ? '⭐' : t('read')}</p>
+    <div class="bar"><i style="width:${baseIds.length ? readN/baseIds.length*100 : 0}%"></i></div></div>`;
+  if (type === 'theme') {
+    const subs = TH[key].subs;
+    html += `<div class="chips"><button class="chip ${!q.sub?'on':''}" data-go="list/theme/${key}${qstr({tier:q.tier})}">${t('all')}</button>` +
+      subs.map(s => `<button class="chip ${q.sub===s.id?'on':''}" data-go="list/theme/${key}${qstr({sub:s.id, tier:q.tier})}">${esc(s[S.set.ui==='ur'?'ur':'en'])}</button>`).join('') + '</div>';
+    html += `<div class="chips" style="padding-top:4px">` + ['', 'both', 'bukhari', 'muslim'].map(tr => `<button class="chip ${(q.tier||'')===tr?'on':''}" data-go="list/theme/${key}${qstr({sub:q.sub, tier:tr})}">${tr ? tierLabel(tr) : t('all')}</button>`).join('') + '</div>';
+  }
+  if (type === 'path' && key === 'kids') {
+    html += `<div class="starrow">${IDX.paths.kids.map(i => `<span class="${S.stars[i]?'on':''}">⭐</span>`).join('')}</div>`;
+  }
+  const lim = +(q.n || PAGE);
+  html += rows(ids.slice(0, type==='path' ? 999 : lim), type, key, Object.assign({}, q, {n: ''}), type === 'path');
+  if (type !== 'path' && ids.length > lim) html += `<button class="more" data-go="list/${type}/${key}${qstr(Object.assign({}, q, {n: lim + PAGE}))}" data-keep>+ ${Math.min(PAGE, ids.length - lim)}</button>`;
+  $('#app').innerHTML = html;
+  nav();
+}
+
+/* ---------- saved ---------- */
+function renderSaved(){
+  tabs('saved'); nav();
+  let html = `<div class="top"><div class="brand" style="font-size:1.4rem">${t('saved')}</div><div class="sp"></div><button class="ib" data-act="settings">${I.gear}</button></div>`;
+  html += S.saved.length ? rows(S.saved.slice().reverse(), 'saved', 's') : `<div class="empty"><div class="big">🤍</div>${t('noSaved')}</div>`;
+  $('#app').innerHTML = html;
+}
+
+/* ---------- reader ---------- */
+let CUR = null;
+function renderRead(type, key, id, q){
+  tabs(null);
+  if (!BY[id]) return go('', true);
+  const ids = listFor(type, key, q);
+  let pos = ids.indexOf(id); if (pos < 0) pos = 0;
+  const it = BY[id]; const th = themeOf(id); const kids = type === 'path' && key === 'kids';
+  const h = `read/${type}/${key}/${id}${qstr(q)}`;
+  S.last = {type, key, id, h}; save();
+  CUR = {type, key, ids, pos, q, id, kids};
+  const langs = langsFor(id); const ar = S.set.ar && tx(id,'ar');
+  const saved = S.saved.includes(id);
+  const thName = TH[th][S.set.ui==='ur'?'ur':'en'];
+  const cls = lastDir; lastDir = '';
+  const L = (l, cls2) => l === 'ur' ? `class="ur ${cls2||''}" dir="rtl" lang="ur"` : `class="en ${cls2||''}"`;
+  const missingUr = S.set.tr !== 'en' && !tx(id,'ur');
+
+  let html = `<div class="rbar"><button class="ib" data-back>${I.back}</button><div class="ctx">${esc(listName(type, key))}${ids.length>1 ? ' · ' + (pos+1) + ' / ' + ids.length : ''}</div>
+    <button class="ib ${saved?'on':''}" data-act="save" aria-label="Save">${saved ? I.heartf : I.heart}</button>
+    <button class="ib" data-act="settings" aria-label="Text settings"><b style="font-size:.95rem">Aa</b></button></div>
+    <div class="prog t-${th}"><i style="width:${ids.length ? (pos+1)/ids.length*100 : 100}%"></i></div>
+    <article class="rd ${cls} t-${th}" id="rd">`;
+
+  if (kids) {
+    const pal = ['#FFE2ED','#ECE6FF','#DFF0FF','#DDF5E8','#FFF2C6','#FFE6D9'];
+    const bg = `linear-gradient(150deg, ${pal[pos % 6]}, ${pal[(pos+2) % 6]})`;
+    const dots = Array.from({length: 7}, (_, i) => `<span style="width:${18+i*9}px;height:${18+i*9}px;background:${pal[(pos+i)%6]};left:${(i*37+pos*13)%90}%;top:${(i*53+pos*7)%85}%"></span>`).join('');
+    html += `<div class="kid" style="background:${bg}"><div class="dots">${dots}</div><span class="num">${pos+1} / ${ids.length}</span>
+      ${ar ? `<p class="kar ar">${esc(ar[0])}</p>` : '<div style="height:10px"></div>'}
+      ${langs.map(l => `<h1 ${L(l)}>${esc(tx(id,l)[0])}</h1>`).join('')}</div>
+      <button class="starbtn ${S.stars[id]?'got':''}" data-act="star">${S.stars[id] ? '✓ ' + t('gotStar') : '⭐ ' + t('learnt')}</button>
+      <div class="starrow">${ids.map(i => `<span class="${S.stars[i]?'on':''}">⭐</span>`).join('')}</div>
+      <button class="fold ${S.set.kidsFull?'open':''}" data-act="fold"><span>${t('fullFor')}</span>${I.down}</button>
+      <div id="full" ${S.set.kidsFull?'':'hidden'}>`;
+  } else {
+    html += `<div class="tags"><span class="tag">${esc(thName)}</span><span class="tag star">${esc(tierLabel(it.t))}</span></div>
+      <div class="key"><span class="qm">”</span>${ar ? `<p class="kar ar">${esc(ar[0])}</p>` : ''}
+      ${langs.map(l => `<h1 ${L(l)}>${esc(tx(id,l)[0])}</h1>`).join('')}</div>`;
+  }
+
+  // The hadith (full text)
+  html += `<section class="card"><h3><i>📜</i>${t('theHadith')}</h3>${ar ? `<p class="ar" lang="ar">${esc(ar[1])}</p>` : ''}` +
+    langs.map(l => paras(tx(id,l)[1]).map(p => `<p ${L(l)}>${esc(p)}</p>`).join('')).join('') +
+    `<div class="grade">${langs.map(l => { const r = tx(id,l); return `<span ${l==='ur'?'dir="rtl" class="ur" style="line-height:1.8"':''}>${esc(r[4])}</span><span ${l==='ur'?'dir="rtl" class="ur" style="line-height:1.8"':''}>${esc(r[5])}</span>`; }).join('')}</div></section>`;
+  if (missingUr) html += `<div class="note"><i>ℹ️</i><span>${t('noUr')}</span></div>`;
+  // Explanation
+  const ex = langs.filter(l => tx(id,l)[2]);
+  if (ex.length) html += `<section class="card"><h3><i>💡</i>${t('meaning')}</h3>` + ex.map(l => paras(tx(id,l)[2]).map(p => `<p ${L(l)}>${esc(p)}</p>`).join('')).join('') + `</section>`;
+  // Lessons
+  const bl = langs.filter(l => tx(id,l)[3]);
+  if (bl.length) html += `<section class="card"><h3><i>🌿</i>${t('lessons')}</h3>` + bl.map(l => `<ol class="lessons ${l==='ur'?'ur':''}" ${l==='ur'?'dir="rtl" lang="ur"':''}>${paras(tx(id,l)[3]).map(p => `<li>${esc(p)}</li>`).join('')}</ol>`).join('<div style="height:14px"></div>') + `</section>`;
+  if (it.f) html += `<div class="note"><i>⚖️</i><span>${t('fiqh')}</span></div>`;
+  html += `<p class="src">${t('source')}: <a href="https://hadeethenc.com/${langs.includes('ur') && !langs.includes('en') ? 'ur' : 'en'}/browse/hadith/${id}" target="_blank" rel="noopener">${t('view')}</a> · <button data-act="share" style="text-decoration:underline">${t('share')}</button></p>`;
+  if (kids) html += `</div>`;
+  html += `</article>`;
+  $('#app').innerHTML = html;
+
+  const isRead = !!S.read[id];
+  const last = pos >= ids.length - 1;
+  nav(`<div class="rnav t-${th}"><div class="in">
+    <button class="nb" data-act="prev" ${pos<=0?'disabled':''} aria-label="Previous">${I.back}</button>
+    ${kids ? `<button class="main" data-act="next">${last ? '🎉 ' + t('finish') : t('next') + ' ' + I.next}</button>` :
+      `<button class="main ${isRead && last ? 'done' : ''}" data-act="next">${last ? (isRead ? I.check + ' ' + t('isRead') : I.check + ' ' + t('markRead')) : (isRead ? t('next') : t('markRead') + ' · ' + t('next')) + ' ' + I.next}</button>`}
+    <button class="nb" data-act="share" aria-label="Share">${I.share}</button></div></div>`);
+}
+function step(d){
+  if (!CUR) return;
+  const {type, key, ids, pos, q, id, kids} = CUR;
+  if (d > 0 && !kids) markRead(id);
+  const np = pos + d;
+  if (np < 0) return;
+  if (np >= ids.length) {
+    if (kids) { if (!S.stars[id]) toggleStar(); }
+    if (ids.length > 1) finished(); else renderRead(type, key, id, q);
+    return;
+  }
+  lastDir = d > 0 ? 'l' : 'r';
+  go(`read/${type}/${key}/${ids[np]}${qstr(q)}`, true);
+}
+function finished(){
+  confetti();
+  $('#app').innerHTML = `<div class="empty" style="padding-top:22vh"><div class="big">🎉</div><p style="font-size:1.1rem;font-weight:800;color:var(--text)">${t('done')}</p>
+    <button class="go" data-go="" style="margin-top:12px">${t('backHome')}</button></div>`;
+  nav();
+}
+function toggleStar(){
+  const id = CUR.id;
+  if (S.stars[id]) return;
+  S.stars[id] = today(); markRead(id); confetti();
+  const b = document.querySelector('.starbtn'); if (b) { b.classList.add('got'); b.textContent = '✓ ' + t('gotStar'); }
+  const row = document.querySelectorAll('.starrow span')[CUR.pos]; if (row) row.classList.add('on');
+}
+function confetti(){
+  const c = document.createElement('div'); c.className = 'confetti';
+  const cols = ['#F7A57E','#A796F5','#86C1F2','#7FD1A8','#F2CF5B','#F49ABD'];
+  c.innerHTML = Array.from({length: 46}, (_, i) => `<i style="left:${Math.random()*100}%;background:${cols[i%6]};animation-delay:${Math.random()*.4}s;animation-duration:${1+Math.random()*.9}s;border-radius:${i%3?'3px':'50%'}"></i>`).join('');
+  document.body.appendChild(c); setTimeout(() => c.remove(), 2600);
+  if (navigator.vibrate) navigator.vibrate(25);
+}
+async function share(){
+  if (!CUR) return;
+  const id = CUR.id; const l = langsFor(id)[0]; const r = tx(id, l);
+  const url = `https://hadeethenc.com/${l}/browse/hadith/${id}`;
+  const text = `“${r[0]}”\n\n${r[4]} ${r[5]}\n${url}`;
+  try { if (navigator.share) { await navigator.share({text}); return; } } catch(e) { if (e.name === 'AbortError') return; }
+  try { await navigator.clipboard.writeText(text); toast(t('copied')); } catch(e) {}
+}
+function toast(m){ const el = $('#toast'); el.textContent = m; el.classList.add('on'); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('on'), 1600); }
+
+/* ---------- settings sheet ---------- */
+function seg(name, opts, val){
+  return `<div class="seg">${opts.map(([v, label]) => `<button class="${String(val)===String(v)?'on':''}" data-set="${name}" data-v="${v}">${label}</button>`).join('')}</div>`;
+}
+function openSheet(){
+  const s = S.set;
+  const m = IDX.meta;
+  $('#sheet').innerHTML = `<div class="grab"></div><h2>${t('settings')}</h2>
+    <div class="opt"><label>${t('trans')}</label>${seg('tr', [['en','English'],['ur','اردو'],['both','English + اردو']], s.tr)}</div>
+    <div class="opt"><label>${t('arabic')}</label>${seg('ar', [['1',t('show')],['0',t('hide')]], s.ar?1:0)}</div>
+    <div class="opt"><label>${t('size')}</label>${seg('size', [['0','A'],['1','<span style="font-size:1.12em">A</span>'],['2','<span style="font-size:1.25em">A</span>'],['3','<span style="font-size:1.4em">A</span>']], s.size)}</div>
+    <div class="opt"><label>${t('look')}</label>${seg('look', [['auto',t('auto')],['light',t('light')],['dark',t('dark')]], s.look)}</div>
+    <div class="opt"><label>${t('lang')}</label>${seg('ui', [['en','English'],['ur','اردو']], s.ui)}</div>
+    <h2 style="margin-top:22px">${t('about')}</h2>
+    <div class="opt about"><p style="margin-top:0">${t('aboutText')}</p><p>${t('edit')}</p>
+      <p><b>${t('updates')}</b></p><pre>${esc(m.en.info)}</pre><pre>${esc(m.ur.info)}</pre>
+      <p style="margin-bottom:0"><button data-act="reset" style="color:#C0455E;font-weight:800">${t('reset')}</button></p></div>`;
+  const sc = $('#scrim'); sc.hidden = false;
+  requestAnimationFrame(() => { sc.classList.add('on'); $('#sheet').classList.add('on'); });
+}
+function closeSheet(){
+  $('#sheet').classList.remove('on'); $('#scrim').classList.remove('on');
+  setTimeout(() => { $('#scrim').hidden = true; }, 220);
+}
+async function setOpt(name, v){
+  if (name === 'ar') v = v === '1';
+  if (name === 'size') v = +v;
+  S.set[name] = v;
+  if (name === 'ui' && v === 'ur' && S.set.tr === 'en') S.set.tr = 'ur';
+  if (name === 'ui' && v === 'en' && S.set.tr === 'ur') S.set.tr = 'en';
+  if (name === 'tr' || name === 'ar' || name === 'ui') SIX = null;
+  save(); applyLook();
+  await need();
+  openSheet();
+  route();
+}
+function applyLook(){
+  const r = document.documentElement; const s = S.set;
+  const dark = s.look === 'dark' || (s.look === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches);
+  r.classList.toggle('dark', dark);
+  r.dataset.size = s.size;
+  r.lang = s.ui; r.dir = s.ui === 'ur' ? 'rtl' : 'ltr';
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click', e => {
+  const g = e.target.closest('[data-go]');
+  if (g) { e.preventDefault(); const h = g.dataset.go; if ('keep' in g.dataset) { history.replaceState(null,'','#/'+h); route(); } else go(h); return; }
+  if (e.target.closest('[data-back]')) { if (depth > 0) { depth--; history.back(); } else go('', true); return; }
+  const s = e.target.closest('[data-set]'); if (s) { setOpt(s.dataset.set, s.dataset.v); return; }
+  const a = e.target.closest('[data-act]'); if (!a) return;
+  const act = a.dataset.act;
+  if (act === 'settings') openSheet();
+  else if (act === 'next') step(1);
+  else if (act === 'prev') step(-1);
+  else if (act === 'share') share();
+  else if (act === 'star') toggleStar();
+  else if (act === 'fold') { const f = $('#full'); f.hidden = !f.hidden; a.classList.toggle('open', !f.hidden); S.set.kidsFull = !f.hidden; save(); }
+  else if (act === 'save') {
+    const id = CUR.id; const i = S.saved.indexOf(id);
+    if (i >= 0) S.saved.splice(i, 1); else S.saved.push(id);
+    save(); a.classList.toggle('on', i < 0); a.innerHTML = i < 0 ? I.heartf : I.heart; toast(i < 0 ? t('saved1') : t('removed'));
+  }
+  else if (act === 'reset') { if (confirm(t('resetQ'))) { S.read = {}; S.stars = {}; S.saved = []; S.days = []; S.last = null; save(); closeSheet(); route(); } }
+});
+$('#scrim').addEventListener('click', closeSheet);
+window.addEventListener('hashchange', route);
+matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', applyLook);
+
+// swipe between hadith
+let sx = 0, sy = 0, st = 0;
+document.addEventListener('touchstart', e => { const p = e.touches[0]; sx = p.clientX; sy = p.clientY; st = Date.now(); }, {passive:true});
+document.addEventListener('touchend', e => {
+  if (!CUR || !document.getElementById('rd') || $('#sheet').classList.contains('on')) return;
+  const p = e.changedTouches[0]; const dx = p.clientX - sx, dy = p.clientY - sy;
+  if (Math.abs(dx) > 70 && Math.abs(dy) < 45 && Date.now() - st < 600) {
+    const rtl = document.documentElement.dir === 'rtl';
+    step((dx < 0) !== rtl ? 1 : -1);
+  }
+}, {passive:true});
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('rd')) return;
+  if (e.key === 'ArrowRight') step(document.documentElement.dir==='rtl' ? -1 : 1);
+  if (e.key === 'ArrowLeft') step(document.documentElement.dir==='rtl' ? 1 : -1);
+});
+
+/* ---------- start ---------- */
+(async function init(){
+  S = load(); applyLook();
+  try {
+    IDX = await getJSON('index');
+    IDX.items.forEach(i => BY[i.id] = i);
+    IDX.themes.forEach(th => TH[th.key] = th);
+    await need();
+  } catch(e) {
+    $('#app').innerHTML = '<div class="empty"><div class="big">📶</div>Could not load the hadith. Please open the app once with internet.</div>';
+  }
+  if (IDX) {
+    // open where you left off on a fresh launch with no link
+    if (!location.hash && S.last && BY[S.last.id] && S.set.resume !== false) { /* stay on home; Continue card shows it */ }
+    await route();
+  }
+  const sp = $('#splash'); setTimeout(() => { sp.style.opacity = 0; setTimeout(() => sp.remove(), 400); }, 450);
+  // keep other data warm for offline use
+  setTimeout(() => ['en','ur','ar'].forEach(k => getJSON(k).then(d => { D[k] ||= d; }).catch(()=>{})), 2500);
+})();
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').then(reg => { reg.update(); }).catch(() => {});
+  let reloaded = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => { if (reloaded || !navigator.serviceWorker.controller) return; reloaded = true; if (sessionStorage.getItem('swr') !== VERSION) { sessionStorage.setItem('swr', VERSION); location.reload(); } });
+}
+</script>
+</body>
+</html>
