@@ -136,6 +136,9 @@ F = ('title', 'text', 'expl', 'ben', 'grade', 'takhrij')
 for lang in ('en', 'ur', 'hi'):
     d = {x['id']: [(to_hinglish(x[lang][k]) if lang == 'hi' else x[lang][k]) for k in F] for x in items if lang in x}
     json.dump(d, open(os.path.join(OUT, f'{lang}.json'), 'w'), ensure_ascii=False, separators=(',', ':'))
+# Hindi in Devanagari, only for the read-aloud voice (Hindi voice speaks the same words as the Hinglish shown)
+d = {x['id']: [x['hi'][k] for k in ('title', 'text', 'expl')] for x in items if 'hi' in x}
+json.dump(d, open(os.path.join(OUT, 'hd.json'), 'w'), ensure_ascii=False, separators=(',', ':'))
 d = {x['id']: [x['ar']['title'], x['ar']['text']] for x in items}
 json.dump(d, open(os.path.join(OUT, 'ar.json'), 'w'), ensure_ascii=False, separators=(',', ':'))
 

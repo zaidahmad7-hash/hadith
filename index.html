@@ -322,6 +322,28 @@ html[lang="ur"] .opt label{text-transform:none;letter-spacing:0;font-size:.9rem}
 .splash{position:fixed;inset:0;z-index:100;background:var(--bg);display:grid;place-items:center;transition:opacity .4s}
 .splash img{width:96px;height:96px;border-radius:26px;animation:popin .7s cubic-bezier(.2,1.4,.4,1)}
 html[dir="rtl"] .flip{transform:scaleX(-1)}
+.lis{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.75);display:grid;place-items:center;color:#2B2440}
+html.dark .lis{background:rgba(255,255,255,.12);color:#F3EEFF}
+.lis svg{width:22px;height:22px}
+.lbtn{width:100%;display:flex;align-items:center;gap:12px;margin-top:12px;background:var(--card);border-radius:20px;padding:10px 14px 10px 10px;box-shadow:var(--shadow);text-align:start}
+.lbtn .pi{width:42px;height:42px;border-radius:14px;background:var(--btn);color:var(--btnText);display:grid;place-items:center;flex:none}
+.lbtn .pi svg{width:20px;height:20px}
+.lbtn b{display:block;font-size:.92rem}.lbtn span{display:block;font-size:.74rem;color:var(--muted)}
+.wave{display:inline-flex;gap:3px;align-items:flex-end;height:16px;margin-inline-start:auto}
+.wave i{width:3px;border-radius:2px;background:var(--dot,#A796F5);animation:wv 1s ease-in-out infinite}
+.wave i:nth-child(2){animation-delay:.15s}.wave i:nth-child(3){animation-delay:.3s}.wave i:nth-child(4){animation-delay:.45s}
+@keyframes wv{0%,100%{height:4px}50%{height:16px}}
+.player{position:fixed;left:12px;right:12px;bottom:calc(var(--safeB) + 82px);z-index:30;max-width:616px;margin:0 auto;display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:22px;background:color-mix(in srgb,var(--card) 94%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);box-shadow:0 10px 30px rgba(40,30,60,.2);animation:fade .25s ease}
+.player .pp{width:44px;height:44px;border-radius:15px;background:linear-gradient(140deg,#F49ABD,#A796F5 55%,#86C1F2);color:#fff;display:grid;place-items:center;flex:none}
+.player .pp svg{width:20px;height:20px}
+.player .pt{flex:1;min-width:0}
+.player .pt b{display:block;font-size:.84rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.player .pt span{display:block;font-size:.72rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.player .pc2{flex:none;padding:7px 9px;border-radius:11px;background:var(--soft);font-size:.74rem;font-weight:900}
+.player .px{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;color:var(--muted);flex:none}
+.player .px svg{width:16px;height:16px}
+.player.home{bottom:calc(var(--safeB) + 84px)}
+body.pl #app{padding-bottom:calc(var(--safeB) + 180px)}
 </style>
 </head>
 <body>
@@ -333,9 +355,10 @@ html[dir="rtl"] .flip{transform:scaleX(-1)}
 <div class="scrim" id="scrim" hidden></div>
 <div class="sheet" id="sheet"></div>
 <div class="toast" id="toast"></div>
+<div id="player"></div>
 <script>
 'use strict';
-const VERSION = '2.0';
+const VERSION = '2.1';
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
@@ -350,6 +373,10 @@ const I = {
   heartf:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>',
   share:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg>',
   check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
+  spk:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5v5h3.5L12 19V5L7.5 9.5z" fill="currentColor"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>',
+  play:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>',
+  pause:'<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4.5" height="14" rx="1.5"/><rect x="13.5" y="5" width="4.5" height="14" rx="1.5"/></svg>',
+  x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>',
   home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><path d="M4 11 12 4l8 7v8a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z"/></svg>',
   explore:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg>',
   faith:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M14.5 4.5A7.5 7.5 0 1 0 19.5 17 6 6 0 0 1 14.5 4.5z"/><path d="m18 6 .7 1.5 1.6.2-1.2 1.1.3 1.6-1.4-.8-1.4.8.3-1.6-1.2-1.1 1.6-.2z" fill="currentColor" stroke-width="1"/></svg>',
@@ -385,7 +412,10 @@ const T = {
   resetQ:'Reset all reading progress, stars and saved hadith on this phone?',share:'Share',keepOne:'Keep at least one translation on',
   qTitle:'Which word is missing?',qRight:'Correct! ⭐',qWrong:'Not quite. The answer is shown.',qNext:'Next question',qDone:'Quiz finished!',qScore:'You got',qAgain:'Play again',qRead:'Read this hadith',
   aboutText:'<b>MyHadithApp</b> shows only hadith graded <b>Sahih (authentic)</b> and narrated by <b>al-Bukhari and/or Muslim</b>, the two most authentic hadith books. The hadith text, translations, explanations and lessons come from <b>HadeethEnc.com</b> (Encyclopedia of Translated Prophetic Hadiths) and are shown exactly as published. <b>Hinglish</b> is HadeethEnc’s Hindi translation written in Roman letters by the app automatically (same words, different script), so some spellings may look unusual. Hadith numbers are shown where HadeethEnc lists them. Your progress stays on this phone. No ads, no tracking.',
-  updates:'Content versions',edit:'Spotted a mistake in a translation? Please report it to HadeethEnc.com.'},
+  updates:'Content versions',edit:'Spotted a mistake in a translation? Please report it to HadeethEnc.com.',
+  listen:'Listen',listening:'Listening',lIn:'Listen in',lMean:'Also read the meaning',lAuto:'Continue to the next hadith',lRate:'Speed',onW:'On',offW:'Off',
+  mArabic:'Arabic',mEnglish:'English',mUrdu:'Urdu / Hindi',lHadith:'Hadith',lMeaning:'Meaning',noVoice:'No voice for this language on this phone. See Settings → Listening.',
+  voiceNote:'Uses your phone\u2019s built-in voices, so it works offline. On iPhone you can download clearer voices in Settings → Accessibility → Spoken Content → Voices (Arabic: Majed; Hindi: Lekha or Kiyara; English: any). Urdu is read with an Urdu voice if your phone has one, otherwise with the Hindi voice using HadeethEnc\u2019s Hindi translation (the same words as the Hinglish). Keep the screen on while listening.'},
  ur:{daily:'آج کی حدیث',read1:'پڑھیں اور سمجھیں',another:'کوئی اور حدیث',today:'آج',goal:'میں سے ۳ پڑھی گئیں',streak:'دن مسلسل',read:'پڑھی گئیں',stars:'ستارے',
   cont:'جاری رکھیں',journeys:'سفر',start:'یہاں سے شروع کریں',startS:'۴۰ بنیادی احادیث جو ہر مسلمان کو معلوم ہونی چاہئیں',
   kids:'ننھے طالب علم',kidsS:'بچوں کے لیے مختصر احادیث۔ ہر حدیث پر ستارہ جیتیں!',quiz:'حدیث کوئز',quizS:'غائب لفظ تلاش کریں۔ بچوں کے لیے مزے دار!',
@@ -404,7 +434,10 @@ const T = {
   resetQ:'اس فون پر پڑھنے کی پیش رفت، ستارے اور محفوظ احادیث صاف کر دیں؟',share:'شیئر',keepOne:'کم از کم ایک ترجمہ رکھیں',
   qTitle:'کون سا لفظ غائب ہے؟',qRight:'شاباش! ⭐',qWrong:'صحیح جواب دکھا دیا گیا۔',qNext:'اگلا سوال',qDone:'کوئز مکمل!',qScore:'آپ کے نمبر',qAgain:'دوبارہ کھیلیں',qRead:'یہ حدیث پڑھیں',
   aboutText:'<b>MyHadithApp</b> میں صرف وہ احادیث ہیں جو <b>صحیح</b> ہیں اور <b>امام بخاری اور/یا امام مسلم</b> نے روایت کی ہیں۔ حدیث کا متن، ترجمہ، شرح اور اسباق <b>HadeethEnc.com</b> سے لیے گئے ہیں اور بغیر تبدیلی کے دکھائے گئے ہیں۔ <b>ہنگلش</b> دراصل HadeethEnc کا ہندی ترجمہ ہے جسے ایپ خود رومن حروف میں لکھتی ہے۔ آپ کی پیش رفت صرف اسی فون پر رہتی ہے۔ کوئی اشتہار نہیں۔',
-  updates:'مواد کے ورژن',edit:'ترجمے میں غلطی نظر آئے تو HadeethEnc.com کو اطلاع دیں۔'}
+  updates:'مواد کے ورژن',edit:'ترجمے میں غلطی نظر آئے تو HadeethEnc.com کو اطلاع دیں۔',
+  listen:'سنیں',listening:'سن رہے ہیں',lIn:'سننے کی زبان',lMean:'مطلب بھی سنائیں',lAuto:'اگلی حدیث خود چلائیں',lRate:'رفتار',onW:'ہاں',offW:'نہیں',
+  mArabic:'عربی',mEnglish:'انگریزی',mUrdu:'اردو / ہندی',lHadith:'حدیث',lMeaning:'مطلب',noVoice:'اس فون میں اس زبان کی آواز نہیں ہے۔ ترتیبات دیکھیں۔',
+  voiceNote:'یہ فون کی اپنی آوازیں استعمال کرتی ہے، اس لیے انٹرنیٹ کے بغیر بھی چلتی ہے۔ آئی فون میں بہتر آوازیں: Settings → Accessibility → Spoken Content → Voices۔ اگر فون میں اردو آواز نہ ہو تو ہندی آواز HadeethEnc کا ہندی ترجمہ پڑھتی ہے۔ سنتے وقت اسکرین آن رکھیں۔'}
 };
 let S;
 const t = k => (T[S.set.ui] || T.en)[k] ?? T.en[k] ?? k;
@@ -416,7 +449,7 @@ function load(){
   let s = {};
   try { s = JSON.parse(localStorage.getItem(KEY)) || {}; } catch(e) {}
   s.read ||= {}; s.saved ||= []; s.stars ||= {}; s.days ||= []; s.quizBest ||= 0;
-  s.set = Object.assign({ui:'en', size:1, look:'auto', kidsFull:false}, s.set || {});
+  s.set = Object.assign({ui:'en', size:1, look:'auto', kidsFull:false, lMean:false, lAuto:true, lRate:1}, s.set || {});
   if (!s.set.langs) {   // migrate v1 settings
     const tr = s.set.tr || 'en'; const L = [];
     if (s.set.ar !== false) L.push('ar');
@@ -424,6 +457,7 @@ function load(){
     if (tr === 'ur' || tr === 'both') L.push('ur');
     s.set.langs = L;
   }
+  if (!s.set.lMode) s.set.lMode = s.set.langs.includes('ur') || s.set.langs.includes('hi') ? 'ar+ur' : 'ar+en';
   return s;
 }
 let saveT;
@@ -545,6 +579,7 @@ async function route(){
   window.scrollTo(0, 0);
   try { await need(); } catch(e) { $('#app').innerHTML = '<div class="empty"><div class="big">📶</div>Could not load the hadith. Please open the app once with internet.</div>'; return; }
   CUR = null;
+  if (PL.on && !PL.next && !(v === 'read' && parts[3] === PL.id)) { if (v === 'read') stopPlay(); }
   if (v === 'read') return renderRead(parts[1], parts[2], parts[3], q);
   if (v === 'list') return renderList(parts[1], parts[2], q);
   if (v === 'explore') return renderExplore(q);
@@ -570,10 +605,10 @@ function dayIndex(){ const d = new Date(); return Math.floor(Date.UTC(d.getFullY
 function pathProgress(key){ const ids = IDX.paths[key]; const n = ids.filter(i => key==='kids' ? S.stars[i] : S.read[i]).length; return [n, ids.length]; }
 function heroInner(id){
   const pl = primary(id); const ar = on('ar') && tx(id,'ar');
-  return `<div class="row1"><span class="pill">✦ ${t('daily')}</span><button class="shuf" data-act="shuffle" aria-label="${t('another')}">🎲</button></div>
+  return `<div class="row1"><span class="pill">✦ ${t('daily')}</span></div>
     ${ar ? `<p class="ar" lang="ar">${esc(ar[0])}</p>` : ''}
     <p class="q ${LCLS[pl]}" ${pl==='ur'?'dir="rtl"':''}>“${esc(tx(id,pl)[0])}”</p>
-    <div class="foot"><button class="go" data-go="read/day/${id}/${id}">${t('read1')} ${I.arrow}</button>${bookBadge(id)}</div>`;
+    <div class="foot"><button class="go" data-go="read/day/${id}/${id}">${t('read1')} ${I.arrow}</button><button class="lis" data-act="listen" data-id="${id}" aria-label="${t('listen')}">${I.spk}</button>${bookBadge(id)}</div>`;
 }
 function ring(n, total){
   const r = 31, c = 2*Math.PI*r, f = Math.min(1, n/total);
@@ -742,12 +777,12 @@ function renderRead(type, key, id, q){
       ${langs.map(l => `<h1 ${lattr(l)}>${esc(tx(id,l)[0])}</h1>`).join('')}<div style="margin-top:12px">${bookBadge(id)}</div></div>
       <button class="starbtn ${S.stars[id]?'got':''}" data-act="star">${S.stars[id] ? '✓ ' + t('gotStar') : '⭐ ' + t('learnt')}</button>
       <div class="starrow">${ids.map(i => `<span class="${S.stars[i]?'on':''}">⭐</span>`).join('')}</div>
-      ${tabsBar(id)}<div id="panel">${panel(id)}</div>`;
+      ${listenBtn(id)}${tabsBar(id)}<div id="panel">${panel(id)}</div>`;
   } else {
     html += sourceCard(id) +
       `<div class="key pat"><span class="tag">${esc(TH[th][S.set.ui==='ur'?'ur':'en'])}</span>${ar ? `<p class="ar" lang="ar">${esc(ar[0])}</p>` : ''}
       ${langs.map(l => `<h1 ${lattr(l)}>${esc(tx(id,l)[0])}</h1>`).join('')}</div>
-      ${tabsBar(id)}<div id="panel">${panel(id)}</div>`;
+      ${listenBtn(id)}${tabsBar(id)}<div id="panel">${panel(id)}</div>`;
   }
   if (it.f) html += `<div class="note"><i>⚖️</i><span>${t('fiqh')}</span></div>`;
   html += `<p class="src">${t('source')}: <a href="https://hadeethenc.com/${primary(id)}/browse/hadith/${id}" target="_blank" rel="noopener">${t('view')}</a></p>`;
@@ -760,6 +795,7 @@ function renderRead(type, key, id, q){
     ${kids ? `<button class="main" data-act="next">${last ? '🎉 ' + t('finish') : t('next') + ' ' + I.next}</button>` :
       `<button class="main" data-act="next">${last ? I.check + ' ' + (isRead ? t('isRead') : t('markRead')) : (isRead ? t('next') : t('markRead') + ' · ' + t('next')) + ' ' + I.next}</button>`}
     <button class="nb" data-act="share" aria-label="${t('share')}">${I.share}</button></div></div>`);
+  if (PL.next) { PL.next = false; play(id); } else playerBar();
 }
 function step(d){
   if (!CUR) return;
@@ -854,6 +890,93 @@ function answer(btn){
     <button class="chip" data-go="read/day/${q.id}/${q.id}">${t('qRead')}</button></div>`;
 }
 
+/* ---------- listen (device text-to-speech, works offline) ---------- */
+const SP = window.speechSynthesis;
+const LMODES = ['ar','en','ur','ar+en','ar+ur'];
+let VOICES = [];
+const loadVoices = () => { try { VOICES = SP ? SP.getVoices() : []; } catch(e) { VOICES = []; } };
+if (SP) { loadVoices(); SP.onvoiceschanged = loadVoices; }
+function voiceFor(lang){
+  const c = VOICES.filter(v => (v.lang || '').toLowerCase().replace('_','-').startsWith(lang));
+  if (!c.length) return null;
+  const sc = v => (/(premium|enhanced|siri|natural|neural|majed|lekha|kiyara)/i.test(v.name) ? 4 : 0) + (lang === 'en' && /en-gb/i.test(v.lang) ? 1 : 0) + (v.localService ? 1 : 0);
+  return c.slice().sort((a, b) => sc(b) - sc(a))[0];
+}
+const modeName = m => m.split('+').map(p => t({ar:'mArabic', en:'mEnglish', ur:'mUrdu'}[p])).join(' + ');
+const PL = {on:false, paused:false, id:null, segs:[], i:0, tok:0, next:false};
+function chunks(text, max){
+  const out = []; let cur = '';
+  for (const part of String(text || '').replace(/\s+/g, ' ').split(/(?<=[.!?؟۔:،,;])\s+/)) {
+    if ((cur + ' ' + part).length > max && cur) { out.push(cur); cur = part; } else cur = cur ? cur + ' ' + part : part;
+    while (cur.length > max * 1.6) { const k = cur.lastIndexOf(' ', max); out.push(cur.slice(0, k > 0 ? k : max)); cur = cur.slice(k > 0 ? k + 1 : max); }
+  }
+  if (cur.trim()) out.push(cur);
+  return out;
+}
+async function buildSegs(id){
+  const segs = [];
+  const add = (txt, lang, voice, label) => chunks(txt, 230).forEach(c => segs.push({text: c, lang, voice, label}));
+  for (const p of S.set.lMode.split('+')) {
+    if (p === 'ar') { const v = voiceFor('ar'); if (!v) { toast(t('noVoice')); continue; } add(tx(id,'ar')[1], 'ar-SA', v, t('mArabic') + ' · ' + t('lHadith')); }
+    if (p === 'en') { const v = voiceFor('en'); const r = tx(id,'en'); if (!v) { toast(t('noVoice')); continue; }
+      add(r[1], v.lang, v, t('mEnglish') + ' · ' + t('lHadith')); if (S.set.lMean) add(r[2], v.lang, v, t('mEnglish') + ' · ' + t('lMeaning')); }
+    if (p === 'ur') {
+      const vu = voiceFor('ur'), vh = voiceFor('hi');
+      if (vu && (D.ur || (D.ur = await getJSON('ur'))) && tx(id,'ur')) { const r = tx(id,'ur'); add(r[1], vu.lang, vu, 'اردو · ' + t('lHadith')); if (S.set.lMean) add(r[2], vu.lang, vu, 'اردو · ' + t('lMeaning')); }
+      else if (vh) { if (!D.hd) D.hd = await getJSON('hd'); const r = D.hd[id]; if (r) { add(r[1], vh.lang, vh, 'Hindi · ' + t('lHadith')); if (S.set.lMean) add(r[2], vh.lang, vh, 'Hindi · ' + t('lMeaning')); } }
+      else toast(t('noVoice'));
+    }
+  }
+  return segs;
+}
+function unlock(){ try { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; SP.speak(u); } catch(e) {} }
+async function play(id, from){
+  if (!SP) { toast(t('noVoice')); return; }
+  const tok = ++PL.tok; SP.cancel(); unlock();
+  if (!VOICES.length) { loadVoices(); }
+  Object.assign(PL, {on:true, paused:false, id, i: from || 0, segs: []});
+  playerBar();
+  const segs = await buildSegs(id);
+  if (tok !== PL.tok) return;
+  if (!segs.length) { stopPlay(); return; }
+  PL.segs = segs; if (PL.i >= segs.length) PL.i = 0;
+  speakNext(tok);
+}
+function speakNext(tok){
+  if (tok !== PL.tok || PL.paused) return;
+  if (PL.i >= PL.segs.length) {
+    const inReader = CUR && CUR.id === PL.id && document.getElementById('rd');
+    if (S.set.lAuto && inReader && CUR.pos < CUR.ids.length - 1) { PL.next = true; step(1); return; }
+    stopPlay(); return;
+  }
+  const sg = PL.segs[PL.i]; playerBar();
+  const u = new SpeechSynthesisUtterance(sg.text);
+  u.voice = sg.voice; u.lang = sg.lang; u.rate = S.set.lRate || 1;
+  u.onend = () => { if (tok === PL.tok && !PL.paused) { PL.i++; speakNext(tok); } };
+  u.onerror = e => { if (tok === PL.tok && !PL.paused && e.error !== 'interrupted' && e.error !== 'canceled') { PL.i++; speakNext(tok); } };
+  SP.speak(u);
+}
+function pause(){ PL.paused = true; PL.tok++; SP.cancel(); playerBar(); }
+function resume(){ PL.paused = false; const tok = ++PL.tok; unlock(); playerBar(); speakNext(tok); }
+function stopPlay(){ PL.tok++; if (SP) SP.cancel(); Object.assign(PL, {on:false, paused:false, segs:[], i:0, next:false}); playerBar(); }
+function listenBtn(id){
+  const playing = PL.on && PL.id === id && !PL.paused;
+  return `<button class="lbtn" data-act="listen" data-id="${id}"><span class="pi">${playing ? I.pause : I.spk}</span><span><b>${playing ? t('listening') : t('listen')}</b><span>${esc(modeName(S.set.lMode))}${S.set.lMean ? ' · ' + t('lMeaning') : ''}</span></span>${playing ? '<span class="wave"><i></i><i></i><i></i><i></i></span>' : ''}</button>`;
+}
+function playerBar(){
+  const el = $('#player');
+  document.querySelectorAll('.lbtn').forEach(b => { if (b.dataset.id) b.outerHTML = listenBtn(b.dataset.id); });
+  document.body.classList.toggle('pl', PL.on);
+  if (!PL.on) { el.innerHTML = ''; return; }
+  const sg = PL.segs[PL.i]; const n = PL.segs.length;
+  const pl = BY[PL.id] ? primary(PL.id) : 'en'; const title = tx(PL.id, pl) ? tx(PL.id, pl)[0] : '';
+  const home = !document.getElementById('rd');
+  el.innerHTML = `<div class="player ${home ? 'home' : ''}"><button class="pp" data-act="pp" aria-label="Play/Pause">${PL.paused ? I.play : I.pause}</button>
+    <div class="pt"><b ${pl==='ur'?'class="ur" dir="rtl" style="line-height:1.7"':''}>${esc(title)}</b><span>${sg ? esc(sg.label) + ' · ' + (PL.i+1) + '/' + n : '…'}</span></div>
+    <button class="pc2" data-act="pmode">${esc(modeName(S.set.lMode))}</button><button class="pc2" data-act="prate">${S.set.lRate}×</button>
+    <button class="px" data-act="stop" aria-label="Stop">${I.x}</button></div>`;
+}
+
 /* ---------- settings sheet ---------- */
 const seg = (name, opts, val) => `<div class="seg">${opts.map(([v, label]) => `<button class="${String(val)===String(v)?'on':''}" data-set="${name}" data-v="${v}">${label}</button>`).join('')}</div>`;
 function openSheet(){
@@ -863,6 +986,12 @@ function openSheet(){
     <div class="opt"><label>${t('size')}</label>${seg('size', [['0','A'],['1','<span style="font-size:1.12em">A</span>'],['2','<span style="font-size:1.25em">A</span>'],['3','<span style="font-size:1.4em">A</span>']], s.size)}</div>
     <div class="opt"><label>${t('look')}</label>${seg('look', [['auto',t('auto')],['light',t('light')],['dark',t('dark')]], s.look)}</div>
     <div class="opt"><label>${t('lang')}</label>${seg('ui', [['en','English'],['ur','اردو']], s.ui)}</div>
+    <h2 style="margin-top:22px">🔊 ${t('listen')}</h2>
+    <div class="opt"><label>${t('lIn')}</label><div class="seg" style="flex-wrap:wrap">${LMODES.map(m => `<button class="${s.lMode===m?'on':''}" data-set="lMode" data-v="${m}" style="flex:1 0 30%">${modeName(m)}</button>`).join('')}</div></div>
+    <div class="opt"><label>${t('lMean')}</label>${seg('lMean', [['1',t('onW')],['0',t('offW')]], s.lMean?1:0)}</div>
+    <div class="opt"><label>${t('lAuto')}</label>${seg('lAuto', [['1',t('onW')],['0',t('offW')]], s.lAuto?1:0)}</div>
+    <div class="opt"><label>${t('lRate')}</label>${seg('lRate', [['0.8','0.8×'],['1','1×'],['1.2','1.2×']], s.lRate)}</div>
+    <div class="opt about" style="font-size:.78rem">${t('voiceNote')}</div>
     <h2 style="margin-top:22px">${t('about')}</h2>
     <div class="opt about"><p style="margin-top:0">${t('aboutText')}</p><p>${t('edit')}</p>
       <p><b>${t('updates')}</b></p><pre>${esc(m.en.info)}</pre><pre>${esc(m.ur.info)}</pre>${m.hi ? `<pre>${esc(m.hi.info)}</pre>` : ''}
@@ -882,7 +1011,8 @@ async function rerender(){
   else { const y = scrollY; await route(); scrollTo(0, y); }
 }
 async function setOpt(name, v){
-  if (name === 'size') v = +v;
+  if (name === 'size' || name === 'lRate') v = +v;
+  if (name === 'lMean' || name === 'lAuto') v = v === '1';
   S.set[name] = v;
   if (name === 'ui' && v === 'ur' && !on('ur')) S.set.langs.push('ur');
   save(); applyLook(); rerender();
@@ -916,16 +1046,17 @@ document.addEventListener('click', e => {
   const a = e.target.closest('[data-act]'); if (!a) return;
   const act = a.dataset.act;
   if (act === 'settings') openSheet();
-  else if (act === 'next') step(1);
-  else if (act === 'prev') step(-1);
+  else if (act === 'next') { const keep = PL.on && !PL.paused; step(1); if (keep) PL.next = true; }
+  else if (act === 'prev') { const keep = PL.on && !PL.paused; step(-1); if (keep) PL.next = true; }
   else if (act === 'share') share();
   else if (act === 'star') toggleStar();
   else if (act === 'qnext') { QZ.i++; renderQuiz(false); scrollTo(0,0); }
   else if (act === 'qagain') renderQuiz(true);
-  else if (act === 'shuffle') {
-    const pool = IDX.daily; let id; do { id = pool[Math.floor(Math.random()*pool.length)]; } while (id === DAILY && pool.length > 1);
-    DAILY = id; const h = $('#hero'); h.innerHTML = heroInner(id); h.classList.remove('fadein'); void h.offsetWidth; h.classList.add('fadein');
-  }
+  else if (act === 'listen') { const id = a.dataset.id || (CUR && CUR.id); if (PL.on && PL.id === id) PL.paused ? resume() : pause(); else play(id); }
+  else if (act === 'pp') { PL.paused ? resume() : pause(); }
+  else if (act === 'stop') stopPlay();
+  else if (act === 'pmode') { const i = LMODES.indexOf(S.set.lMode); S.set.lMode = LMODES[(i+1) % LMODES.length]; save(); if (PL.on) play(PL.id); else playerBar(); }
+  else if (act === 'prate') { const R = [0.8, 1, 1.2]; S.set.lRate = R[(R.indexOf(S.set.lRate)+1) % 3]; save(); if (PL.on) { const i = PL.i; play(PL.id, i); } }
   else if (act === 'save') {
     const id = CUR.id; const i = S.saved.indexOf(id);
     if (i >= 0) S.saved.splice(i, 1); else S.saved.push(id);
