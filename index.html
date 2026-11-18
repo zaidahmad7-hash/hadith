@@ -358,7 +358,7 @@ body.pl #app{padding-bottom:calc(var(--safeB) + 180px)}
 <div id="player"></div>
 <script>
 'use strict';
-const VERSION = '2.1';
+const VERSION = '2.2';
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
@@ -415,6 +415,7 @@ const T = {
   updates:'Content versions',edit:'Spotted a mistake in a translation? Please report it to HadeethEnc.com.',
   listen:'Listen',listening:'Listening',lIn:'Listen in',lMean:'Also read the meaning',lAuto:'Continue to the next hadith',lRate:'Speed',onW:'On',offW:'Off',
   mArabic:'Arabic',mEnglish:'English',mUrdu:'Urdu / Hindi',lHadith:'Hadith',lMeaning:'Meaning',noVoice:'No voice for this language on this phone. See Settings → Listening.',
+  voices:'Voices on this phone (tap to test)',silent:'Hear nothing? Turn off Silent mode (the switch or Action button on the side of the iPhone) and turn the volume up. iPhone mutes these voices in Silent mode.',
   voiceNote:'Uses your phone\u2019s built-in voices, so it works offline. On iPhone you can download clearer voices in Settings → Accessibility → Spoken Content → Voices (Arabic: Majed; Hindi: Lekha or Kiyara; English: any). Urdu is read with an Urdu voice if your phone has one, otherwise with the Hindi voice using HadeethEnc\u2019s Hindi translation (the same words as the Hinglish). Keep the screen on while listening.'},
  ur:{daily:'آج کی حدیث',read1:'پڑھیں اور سمجھیں',another:'کوئی اور حدیث',today:'آج',goal:'میں سے ۳ پڑھی گئیں',streak:'دن مسلسل',read:'پڑھی گئیں',stars:'ستارے',
   cont:'جاری رکھیں',journeys:'سفر',start:'یہاں سے شروع کریں',startS:'۴۰ بنیادی احادیث جو ہر مسلمان کو معلوم ہونی چاہئیں',
@@ -437,6 +438,7 @@ const T = {
   updates:'مواد کے ورژن',edit:'ترجمے میں غلطی نظر آئے تو HadeethEnc.com کو اطلاع دیں۔',
   listen:'سنیں',listening:'سن رہے ہیں',lIn:'سننے کی زبان',lMean:'مطلب بھی سنائیں',lAuto:'اگلی حدیث خود چلائیں',lRate:'رفتار',onW:'ہاں',offW:'نہیں',
   mArabic:'عربی',mEnglish:'انگریزی',mUrdu:'اردو / ہندی',lHadith:'حدیث',lMeaning:'مطلب',noVoice:'اس فون میں اس زبان کی آواز نہیں ہے۔ ترتیبات دیکھیں۔',
+  voices:'اس فون کی آوازیں (سننے کے لیے دبائیں)',silent:'آواز نہیں آ رہی؟ آئی فون کا سائلنٹ موڈ بند کریں (سائیڈ کا سوئچ یا ایکشن بٹن) اور آواز بڑھائیں۔ سائلنٹ موڈ میں یہ آوازیں بند رہتی ہیں۔',
   voiceNote:'یہ فون کی اپنی آوازیں استعمال کرتی ہے، اس لیے انٹرنیٹ کے بغیر بھی چلتی ہے۔ آئی فون میں بہتر آوازیں: Settings → Accessibility → Spoken Content → Voices۔ اگر فون میں اردو آواز نہ ہو تو ہندی آواز HadeethEnc کا ہندی ترجمہ پڑھتی ہے۔ سنتے وقت اسکرین آن رکھیں۔'}
 };
 let S;
@@ -483,8 +485,8 @@ let IDX, BY = {}, TH = {}, D = {};
 const loaders = {};
 const getJSON = name => loaders[name] ||= fetch('data/'+name+'.json').then(r => { if(!r.ok) throw new Error(name); return r.json(); });
 async function need(){
-  const want = new Set(['en', ...S.set.langs]);
-  if (S.set.ui === 'ur') want.add('ur');
+  const want = new Set(['en', 'ar', ...S.set.langs]);
+  if (S.set.ui === 'ur' || S.set.lMode.includes('ur')) want.add('ur');
   await Promise.all([...want].map(async k => { if (!D[k]) D[k] = await getJSON(k); }));
 }
 const tierOrder = {both:0, bukhari:1, muslim:2};
@@ -579,7 +581,7 @@ async function route(){
   window.scrollTo(0, 0);
   try { await need(); } catch(e) { $('#app').innerHTML = '<div class="empty"><div class="big">📶</div>Could not load the hadith. Please open the app once with internet.</div>'; return; }
   CUR = null;
-  if (PL.on && !PL.next && !(v === 'read' && parts[3] === PL.id)) { if (v === 'read') stopPlay(); }
+  if (PL.on && v === 'read' && parts[3] !== PL.id) stopPlay();
   if (v === 'read') return renderRead(parts[1], parts[2], parts[3], q);
   if (v === 'list') return renderList(parts[1], parts[2], q);
   if (v === 'explore') return renderExplore(q);
@@ -795,7 +797,12 @@ function renderRead(type, key, id, q){
     ${kids ? `<button class="main" data-act="next">${last ? '🎉 ' + t('finish') : t('next') + ' ' + I.next}</button>` :
       `<button class="main" data-act="next">${last ? I.check + ' ' + (isRead ? t('isRead') : t('markRead')) : (isRead ? t('next') : t('markRead') + ' · ' + t('next')) + ' ' + I.next}</button>`}
     <button class="nb" data-act="share" aria-label="${t('share')}">${I.share}</button></div></div>`);
-  if (PL.next) { PL.next = false; play(id); } else playerBar();
+  playerBar();
+}
+function move(d){
+  const tgt = CUR && CUR.ids[CUR.pos + d];
+  if (tgt && PL.on && !PL.paused) play(tgt); else if (PL.on && !tgt) stopPlay();
+  step(d);
 }
 function step(d){
   if (!CUR) return;
@@ -903,7 +910,7 @@ function voiceFor(lang){
   return c.slice().sort((a, b) => sc(b) - sc(a))[0];
 }
 const modeName = m => m.split('+').map(p => t({ar:'mArabic', en:'mEnglish', ur:'mUrdu'}[p])).join(' + ');
-const PL = {on:false, paused:false, id:null, segs:[], i:0, tok:0, next:false};
+const PL = {on:false, paused:false, id:null, segs:[], i:0, tok:0};
 function chunks(text, max){
   const out = []; let cur = '';
   for (const part of String(text || '').replace(/\s+/g, ' ').split(/(?<=[.!?؟۔:،,;])\s+/)) {
@@ -913,52 +920,83 @@ function chunks(text, max){
   if (cur.trim()) out.push(cur);
   return out;
 }
-async function buildSegs(id){
+function pickVoice(lang){
+  // returns [voice|null, ok]; if the phone hasn't listed its voices yet, still try with just the language code
+  if (!VOICES.length) loadVoices();
+  if (!VOICES.length) return [null, true];
+  const v = voiceFor(lang); return [v, !!v];
+}
+function segsFor(id){
   const segs = [];
-  const add = (txt, lang, voice, label) => chunks(txt, 230).forEach(c => segs.push({text: c, lang, voice, label}));
+  const add = (txt, lang, voice, label) => chunks(txt, 220).forEach(c => segs.push({text: c, lang: voice ? voice.lang : lang, voice, label}));
+  let missing = false;
   for (const p of S.set.lMode.split('+')) {
-    if (p === 'ar') { const v = voiceFor('ar'); if (!v) { toast(t('noVoice')); continue; } add(tx(id,'ar')[1], 'ar-SA', v, t('mArabic') + ' · ' + t('lHadith')); }
-    if (p === 'en') { const v = voiceFor('en'); const r = tx(id,'en'); if (!v) { toast(t('noVoice')); continue; }
-      add(r[1], v.lang, v, t('mEnglish') + ' · ' + t('lHadith')); if (S.set.lMean) add(r[2], v.lang, v, t('mEnglish') + ' · ' + t('lMeaning')); }
+    if (p === 'ar') { const [v, ok] = pickVoice('ar'); if (!ok) { missing = true; continue; } if (!tx(id,'ar')) continue; add(tx(id,'ar')[1], 'ar-SA', v, t('mArabic') + ' · ' + t('lHadith')); }
+    if (p === 'en') { const [v, ok] = pickVoice('en'); const r = tx(id,'en'); if (!ok) { missing = true; continue; }
+      add(r[1], 'en-GB', v, t('mEnglish') + ' · ' + t('lHadith')); if (S.set.lMean) add(r[2], 'en-GB', v, t('mEnglish') + ' · ' + t('lMeaning')); }
     if (p === 'ur') {
-      const vu = voiceFor('ur'), vh = voiceFor('hi');
-      if (vu && (D.ur || (D.ur = await getJSON('ur'))) && tx(id,'ur')) { const r = tx(id,'ur'); add(r[1], vu.lang, vu, 'اردو · ' + t('lHadith')); if (S.set.lMean) add(r[2], vu.lang, vu, 'اردو · ' + t('lMeaning')); }
-      else if (vh) { if (!D.hd) D.hd = await getJSON('hd'); const r = D.hd[id]; if (r) { add(r[1], vh.lang, vh, 'Hindi · ' + t('lHadith')); if (S.set.lMean) add(r[2], vh.lang, vh, 'Hindi · ' + t('lMeaning')); } }
-      else toast(t('noVoice'));
+      const vu = VOICES.length ? voiceFor('ur') : null; const [vh, okh] = pickVoice('hi');
+      if (vu && D.ur && tx(id,'ur')) { const r = tx(id,'ur'); add(r[1], 'ur-PK', vu, 'اردو · ' + t('lHadith')); if (S.set.lMean) add(r[2], 'ur-PK', vu, 'اردو · ' + t('lMeaning')); }
+      else if (okh) {
+        if (D.hd) { const r = D.hd[id]; if (r) { add(r[1], 'hi-IN', vh, 'Hindi · ' + t('lHadith')); if (S.set.lMean) add(r[2], 'hi-IN', vh, 'Hindi · ' + t('lMeaning')); } }
+        else segs.push({need: 'hd', id, label: 'Hindi · ' + t('lHadith')});
+      } else missing = true;
     }
   }
+  if (missing) toast(t('noVoice'));
   return segs;
 }
-function unlock(){ try { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; SP.speak(u); } catch(e) {} }
-async function play(id, from){
-  if (!SP) { toast(t('noVoice')); return; }
-  const tok = ++PL.tok; SP.cancel(); unlock();
-  if (!VOICES.length) { loadVoices(); }
-  Object.assign(PL, {on:true, paused:false, id, i: from || 0, segs: []});
-  playerBar();
-  const segs = await buildSegs(id);
-  if (tok !== PL.tok) return;
-  if (!segs.length) { stopPlay(); return; }
-  PL.segs = segs; if (PL.i >= segs.length) PL.i = 0;
+function preloadHd(){ if (S.set.lMode.includes('ur') && !D.hd) getJSON('hd').then(d => { D.hd = d; }).catch(() => {}); }
+// play() must speak synchronously: iPhone only allows speech that starts inside a tap
+function play(id, from){
+  if (!SP || !window.SpeechSynthesisUtterance) { toast(t('noVoice')); return; }
+  const tok = ++PL.tok;
+  try { if (SP.speaking || SP.pending) SP.cancel(); } catch(e) {}
+  Object.assign(PL, {on:true, paused:false, id, i: from || 0, segs: segsFor(id)});
+  if (!PL.segs.length) { stopPlay(); return; }
+  if (PL.i >= PL.segs.length) PL.i = 0;
   speakNext(tok);
 }
 function speakNext(tok){
   if (tok !== PL.tok || PL.paused) return;
   if (PL.i >= PL.segs.length) {
     const inReader = CUR && CUR.id === PL.id && document.getElementById('rd');
-    if (S.set.lAuto && inReader && CUR.pos < CUR.ids.length - 1) { PL.next = true; step(1); return; }
+    if (S.set.lAuto && inReader && CUR.pos < CUR.ids.length - 1) { play(CUR.ids[CUR.pos + 1]); step(1); return; }
     stopPlay(); return;
   }
-  const sg = PL.segs[PL.i]; playerBar();
+  const sg = PL.segs[PL.i];
+  if (sg.need === 'hd') {
+    playerBar();
+    getJSON('hd').then(d => { D.hd = d; if (tok !== PL.tok) return;
+      const rest = segsFor(PL.id).filter(x => x.label.startsWith('Hindi') || x.need);
+      PL.segs.splice(PL.i, 1, ...rest.filter(x => !x.need)); speakNext(tok); }).catch(() => { PL.i++; speakNext(tok); });
+    return;
+  }
+  playerBar();
   const u = new SpeechSynthesisUtterance(sg.text);
-  u.voice = sg.voice; u.lang = sg.lang; u.rate = S.set.lRate || 1;
+  if (sg.voice) u.voice = sg.voice;
+  u.lang = sg.lang; u.rate = S.set.lRate || 1; u.volume = 1;
   u.onend = () => { if (tok === PL.tok && !PL.paused) { PL.i++; speakNext(tok); } };
   u.onerror = e => { if (tok === PL.tok && !PL.paused && e.error !== 'interrupted' && e.error !== 'canceled') { PL.i++; speakNext(tok); } };
   SP.speak(u);
+  try { if (SP.paused) SP.resume(); } catch(e) {}
 }
-function pause(){ PL.paused = true; PL.tok++; SP.cancel(); playerBar(); }
-function resume(){ PL.paused = false; const tok = ++PL.tok; unlock(); playerBar(); speakNext(tok); }
-function stopPlay(){ PL.tok++; if (SP) SP.cancel(); Object.assign(PL, {on:false, paused:false, segs:[], i:0, next:false}); playerBar(); }
+function pause(){ PL.paused = true; PL.tok++; try { SP.cancel(); } catch(e) {} playerBar(); }
+function resume(){ PL.paused = false; const tok = ++PL.tok; speakNext(tok); }
+function stopPlay(){ PL.tok++; try { if (SP) SP.cancel(); } catch(e) {} Object.assign(PL, {on:false, paused:false, segs:[], i:0}); playerBar(); }
+function testVoice(lang){
+  if (!SP) { toast(t('noVoice')); return; }
+  const txt = {ar:'بسم الله الرحمن الرحيم', en:'In the name of Allah, the Most Merciful.', hi:'अल्लाह के नाम से, जो बड़ा मेहरबान है।', ur:'اللہ کے نام سے جو بڑا مہربان ہے۔'}[lang];
+  try { SP.cancel(); } catch(e) {}
+  const u = new SpeechSynthesisUtterance(txt); const v = VOICES.length ? voiceFor(lang) : null;
+  if (v) u.voice = v; u.lang = v ? v.lang : ({ar:'ar-SA', en:'en-GB', hi:'hi-IN', ur:'ur-PK'}[lang]); u.volume = 1;
+  SP.speak(u);
+}
+function voiceReport(){
+  loadVoices();
+  return ['ar','en','hi','ur'].map(l => { const v = VOICES.length ? voiceFor(l) : null;
+    return `<button class="chip" data-test="${l}" style="margin:0 6px 6px 0">${v ? '✓' : (VOICES.length ? '✗' : '?')} ${({ar:'عربي',en:'English',hi:'Hindi',ur:'اردو'})[l]}${v ? ' · ' + esc(v.name) : ''} ▶</button>`; }).join('');
+}
 function listenBtn(id){
   const playing = PL.on && PL.id === id && !PL.paused;
   return `<button class="lbtn" data-act="listen" data-id="${id}"><span class="pi">${playing ? I.pause : I.spk}</span><span><b>${playing ? t('listening') : t('listen')}</b><span>${esc(modeName(S.set.lMode))}${S.set.lMean ? ' · ' + t('lMeaning') : ''}</span></span>${playing ? '<span class="wave"><i></i><i></i><i></i><i></i></span>' : ''}</button>`;
@@ -991,6 +1029,7 @@ function openSheet(){
     <div class="opt"><label>${t('lMean')}</label>${seg('lMean', [['1',t('onW')],['0',t('offW')]], s.lMean?1:0)}</div>
     <div class="opt"><label>${t('lAuto')}</label>${seg('lAuto', [['1',t('onW')],['0',t('offW')]], s.lAuto?1:0)}</div>
     <div class="opt"><label>${t('lRate')}</label>${seg('lRate', [['0.8','0.8×'],['1','1×'],['1.2','1.2×']], s.lRate)}</div>
+    <div class="opt"><label>${t('voices')}</label><div style="display:flex;flex-wrap:wrap">${voiceReport()}</div><p class="about" style="margin:4px 0 0;font-size:.76rem">${t('silent')}</p></div>
     <div class="opt about" style="font-size:.78rem">${t('voiceNote')}</div>
     <h2 style="margin-top:22px">${t('about')}</h2>
     <div class="opt about"><p style="margin-top:0">${t('aboutText')}</p><p>${t('edit')}</p>
@@ -1015,7 +1054,7 @@ async function setOpt(name, v){
   if (name === 'lMean' || name === 'lAuto') v = v === '1';
   S.set[name] = v;
   if (name === 'ui' && v === 'ur' && !on('ur')) S.set.langs.push('ur');
-  save(); applyLook(); rerender();
+  save(); applyLook(); preloadHd(); rerender();
 }
 async function toggleLang(l){
   const L = S.set.langs; const i = L.indexOf(l);
@@ -1042,12 +1081,13 @@ document.addEventListener('click', e => {
   const s = e.target.closest('[data-set]'); if (s) { setOpt(s.dataset.set, s.dataset.v); return; }
   const lg = e.target.closest('[data-lang]'); if (lg) { toggleLang(lg.dataset.lang); return; }
   const tb = e.target.closest('[data-tab]'); if (tb && CUR) { TAB = tb.dataset.tab; document.querySelectorAll('.seg3 button').forEach(b => b.classList.toggle('on', b === tb)); $('#panel').innerHTML = panel(CUR.id); return; }
+  const tv = e.target.closest('[data-test]'); if (tv) { testVoice(tv.dataset.test); return; }
   const an = e.target.closest('[data-ans]'); if (an) { answer(an); return; }
   const a = e.target.closest('[data-act]'); if (!a) return;
   const act = a.dataset.act;
   if (act === 'settings') openSheet();
-  else if (act === 'next') { const keep = PL.on && !PL.paused; step(1); if (keep) PL.next = true; }
-  else if (act === 'prev') { const keep = PL.on && !PL.paused; step(-1); if (keep) PL.next = true; }
+  else if (act === 'next') move(1);
+  else if (act === 'prev') move(-1);
   else if (act === 'share') share();
   else if (act === 'star') toggleStar();
   else if (act === 'qnext') { QZ.i++; renderQuiz(false); scrollTo(0,0); }
@@ -1073,13 +1113,13 @@ document.addEventListener('touchend', e => {
   if (!CUR || !document.getElementById('rd') || sheetOpen()) return;
   if (e.target.closest('.langs,.seg3,.chips')) return;
   const p = e.changedTouches[0]; const dx = p.clientX - sx, dy = p.clientY - sy;
-  if (Math.abs(dx) > 70 && Math.abs(dy) < 45 && Date.now() - st < 600) step((dx < 0) !== (document.documentElement.dir === 'rtl') ? 1 : -1);
+  if (Math.abs(dx) > 70 && Math.abs(dy) < 45 && Date.now() - st < 600) move((dx < 0) !== (document.documentElement.dir === 'rtl') ? 1 : -1);
 }, {passive:true});
 document.addEventListener('keydown', e => {
   if (!document.getElementById('rd')) return;
   const rtl = document.documentElement.dir === 'rtl';
-  if (e.key === 'ArrowRight') step(rtl ? -1 : 1);
-  if (e.key === 'ArrowLeft') step(rtl ? 1 : -1);
+  if (e.key === 'ArrowRight') move(rtl ? -1 : 1);
+  if (e.key === 'ArrowLeft') move(rtl ? 1 : -1);
 });
 
 /* ---------- start ---------- */
@@ -1095,7 +1135,7 @@ document.addEventListener('keydown', e => {
     $('#app').innerHTML = '<div class="empty"><div class="big">📶</div>Could not load the hadith. Please open the app once with internet.</div>';
   }
   const sp = $('#splash'); setTimeout(() => { sp.style.opacity = 0; setTimeout(() => sp.remove(), 400); }, 450);
-  setTimeout(() => ['en','ur','hi','ar'].forEach(k => getJSON(k).then(d => { D[k] ||= d; }).catch(()=>{})), 2500);
+  setTimeout(() => { ['en','ur','hi','ar'].forEach(k => getJSON(k).then(d => { D[k] ||= d; }).catch(()=>{})); preloadHd(); loadVoices(); }, 2500);
 })();
 
 if ('serviceWorker' in navigator) {
