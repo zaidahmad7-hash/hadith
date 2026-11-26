@@ -102,12 +102,18 @@ html.dark .hero .go{background:#F3EEFF;color:#221B33}
 html.dark .book{background:rgba(255,255,255,.1);color:inherit}
 .book .bk{display:inline-flex;gap:2px}
 .bk i{display:block;width:9px;height:16px;border-radius:2px 3px 3px 2px;box-shadow:inset -2px 0 0 rgba(0,0,0,.12)}
-.bk .b{background:#5B8DEF}.bk .m{background:#3DBE8B}
+.bk{display:inline-flex;gap:2px}
 .source{display:flex;align-items:center;gap:14px;border-radius:22px;padding:14px 16px;margin:0 0 12px;background:var(--card);box-shadow:var(--shadow)}
 .source .bk{display:flex;gap:4px;flex:none}
 .source .bk i{width:16px;height:30px;border-radius:3px 5px 5px 3px}
 .source b{display:block;font-size:1rem;line-height:1.3}
 .source span{display:block;font-size:.78rem;color:var(--muted);line-height:1.4;margin-top:2px}
+.gr{display:inline-block;font-size:.66rem;font-weight:900;padding:2px 7px;border-radius:6px;margin-inline-start:6px}
+.gr.s{background:#DDF5E8;color:#2B7553}.gr.h{background:#FFF2C6;color:#7A5C0A}
+html.dark .gr.s{background:#1B3329;color:#A5E5C4}html.dark .gr.h{background:#3A3216;color:#F7DF8E}
+.source .tags2{display:flex;gap:0;flex-wrap:wrap;margin-top:6px}.source .tags2 .gr{margin-inline-start:6px;font-size:.7rem;padding:3px 8px}.source .tags2 .lvl{margin-top:0}
+.jr.j-naw{background:linear-gradient(150deg,#FFEACF,#E5F1D8);color:#6A4210}.jr.j-qud{background:linear-gradient(150deg,#DFF0FF,#ECE6FF);color:#2E3E7A}
+html.dark .jr.j-naw{background:linear-gradient(150deg,#3A2C18,#26321C);color:#FFE0B5}html.dark .jr.j-qud{background:linear-gradient(150deg,#1D2C3D,#2A2541);color:#D7DCFF}
 .source .lvl{display:inline-block;margin-top:6px;font-size:.7rem;font-weight:900;padding:3px 8px;border-radius:7px;background:#FFF2C6;color:#7A5C0A}
 html.dark .source .lvl{background:#3A3216;color:#F7DF8E}
 
@@ -358,7 +364,7 @@ body.pl #app{padding-bottom:calc(var(--safeB) + 180px)}
 <div id="player"></div>
 <script>
 'use strict';
-const VERSION = '2.2';
+const VERSION = '3.0';
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
@@ -400,6 +406,11 @@ const T = {
   themes:'Topics',strongest:'By book',hadith:'hadith',home:'Home',explore:'Explore',saved:'Saved',all:'All',
   bothL:'Sahih al-Bukhari & Sahih Muslim',bukhariL:'Sahih al-Bukhari',muslimL:'Sahih Muslim',
   bothS:'Agreed upon (Muttafaq ʿalayh): narrated by both. The highest level of authenticity.',bukhariS:'Narrated by Imam al-Bukhari. Authentic (Sahih).',muslimS:'Narrated by Imam Muslim. Authentic (Sahih).',
+  both:'Agreed upon',otherBooks:'Other books',otherS:'Narrated in other hadith books.',narrBy:'Narrated by',bmOnly:'Bukhari & Muslim',
+  gradeS:'Sahih',gradeH:'Hasan',hasanNote:'Hasan (good): an accepted, reliable hadith, one level below Sahih.',
+  nawawi:"Imam Nawawi's 40",nawawiS:'The 42 foundational hadith collected by Imam an-Nawawi',qudsi:'Hadith Qudsi',qudsiS:'The Prophet ﷺ tells us what Allah said',
+  scope:'Show hadith from',scopeAll:'All authentic books',scopeBM:'Bukhari & Muslim only',
+  bk_both:'Agreed upon: narrated by both. The highest level.',bk_b:'Collected by Imam al-Bukhari (d. 256 AH).',bk_m:'Collected by Imam Muslim (d. 261 AH).',bk_d:'Collected by Imam Abu Dawud (d. 275 AH).',bk_t:'Collected by Imam at-Tirmidhi (d. 279 AH).',bk_n:"Collected by Imam an-Nasa'i (d. 303 AH).",bk_i:'Collected by Imam Ibn Majah (d. 273 AH).',bk_k:'Collected by Imam Malik (d. 179 AH).',
   bothShort:'Bukhari & Muslim',bukhariShort:'Bukhari',muslimShort:'Muslim',top:'Highest level',no:'No.',
   tH:'Hadith',tM:'Meaning',tL:'Lessons',markRead:'Mark as read',isRead:'Read',next:'Next',finish:'Finish',
   learnt:'I learnt this!',gotStar:'Star collected!',searchPh:'Search in English, Urdu, Hinglish or Arabic…',
@@ -423,6 +434,11 @@ const T = {
   themes:'موضوعات',strongest:'کتاب کے لحاظ سے',hadith:'احادیث',home:'ہوم',explore:'تلاش',saved:'محفوظ',all:'سب',
   bothL:'صحیح بخاری و صحیح مسلم',bukhariL:'صحیح بخاری',muslimL:'صحیح مسلم',
   bothS:'متفق علیہ: دونوں نے روایت کی۔ صحت کا سب سے اونچا درجہ۔',bukhariS:'امام بخاری کی روایت۔ صحیح۔',muslimS:'امام مسلم کی روایت۔ صحیح۔',
+  both:'متفق علیہ',otherBooks:'دیگر کتب',otherS:'دیگر کتبِ حدیث میں مروی۔',narrBy:'روایت:',bmOnly:'بخاری و مسلم',
+  gradeS:'صحیح',gradeH:'حسن',hasanNote:'حسن: مقبول اور قابلِ اعتماد حدیث، صحیح سے ایک درجہ کم۔',
+  nawawi:'اربعین نووی',nawawiS:'امام نووی کی جمع کردہ ۴۲ بنیادی احادیث',qudsi:'احادیثِ قدسیہ',qudsiS:'نبی ﷺ اللہ تعالیٰ کا فرمان بیان فرماتے ہیں',
+  scope:'احادیث دکھائیں',scopeAll:'تمام مستند کتب',scopeBM:'صرف بخاری و مسلم',
+  bk_both:'متفق علیہ: دونوں نے روایت کی۔ سب سے اونچا درجہ۔',bk_b:'امام بخاری (وفات ۲۵۶ھ) کی جمع کردہ۔',bk_m:'امام مسلم (وفات ۲۶۱ھ) کی جمع کردہ۔',bk_d:'امام ابو داود (وفات ۲۷۵ھ) کی جمع کردہ۔',bk_t:'امام ترمذی (وفات ۲۷۹ھ) کی جمع کردہ۔',bk_n:'امام نسائی (وفات ۳۰۳ھ) کی جمع کردہ۔',bk_i:'امام ابن ماجہ (وفات ۲۷۳ھ) کی جمع کردہ۔',bk_k:'امام مالک (وفات ۱۷۹ھ) کی جمع کردہ۔',
   bothShort:'بخاری و مسلم',bukhariShort:'بخاری',muslimShort:'مسلم',top:'اعلیٰ درجہ',no:'نمبر',
   tH:'حدیث',tM:'مطلب',tL:'اسباق',markRead:'پڑھ لی',isRead:'پڑھ لی',next:'اگلی',finish:'مکمل',
   learnt:'میں نے سیکھ لیا!',gotStar:'ستارہ مل گیا!',searchPh:'اردو، انگریزی، ہنگلش یا عربی میں تلاش کریں…',
@@ -489,7 +505,9 @@ async function need(){
   if (S.set.ui === 'ur' || S.set.lMode.includes('ur')) want.add('ur');
   await Promise.all([...want].map(async k => { if (!D[k]) D[k] = await getJSON(k); }));
 }
-const tierOrder = {both:0, bukhari:1, muslim:2};
+const tierOrder = {both:0, bukhari:1, muslim:2, other:3};
+// visible library: hides path-only items; honours the "Bukhari & Muslim only" setting
+const VIS = () => IDX.items.filter(i => !i.h && (S.set.scope !== 'bm' || i.t !== 'other'));
 const paras = s => String(s||'').split(/\n+/).map(x => x.trim()).filter(Boolean);
 const tx = (id, l) => D[l] && D[l][id];
 function trLangs(id){
@@ -510,16 +528,40 @@ const lattr = l => l === 'ur' ? 'class="ur" dir="rtl" lang="ur"' : l === 'hi' ? 
 function themeOf(id){ return BY[id].th[0] || 'society'; }
 
 /* book labels: clearly name the book (and hadith number where HadeethEnc lists it) */
-function bookIcon(tier){ return `<span class="bk">${tier !== 'muslim' ? '<i class="b"></i>' : ''}${tier !== 'bukhari' ? '<i class="m"></i>' : ''}</span>`; }
-function nums(id){
-  const r = BY[id].r || {}; const u = S.set.ui === 'ur';
-  const p = [];
-  if (r.b) p.push(t('bukhariShort') + ' ' + r.b.join(', '));
-  if (r.m) p.push(t('muslimShort') + ' ' + r.m.join(', '));
-  return p.join(' · ');
+const BOOKS = {
+  b:{en:'Sahih al-Bukhari', s:'Bukhari', ur:'صحیح بخاری', us:'بخاری', c:'#5B8DEF'},
+  m:{en:'Sahih Muslim', s:'Muslim', ur:'صحیح مسلم', us:'مسلم', c:'#3DBE8B'},
+  d:{en:'Sunan Abi Dawud', s:'Abu Dawud', ur:'سنن ابی داود', us:'ابو داود', c:'#F2994A'},
+  t:{en:"Jami' at-Tirmidhi", s:'Tirmidhi', ur:'جامع ترمذی', us:'ترمذی', c:'#9B6DF2'},
+  n:{en:"Sunan an-Nasa'i", s:"Nasa'i", ur:'سنن نسائی', us:'نسائی', c:'#EC6FA0'},
+  i:{en:'Sunan Ibn Majah', s:'Ibn Majah', ur:'سنن ابن ماجہ', us:'ابن ماجہ', c:'#2FB5AE'},
+  k:{en:'Muwatta Malik', s:'Malik', ur:'موطا امام مالک', us:'مالک', c:'#B8895B'},
+  a:{en:'Musnad Ahmad', s:'Ahmad', ur:'مسند احمد', us:'احمد', c:'#9AA0A6'},
+};
+const BOOK_ORDER = ['b','m','d','t','n','i','k'];
+const bname = (k, full) => { const B = BOOKS[k]; const u = S.set.ui === 'ur'; return full ? (u ? B.ur : B.en) : (u ? B.us : B.s); };
+const bks = id => (BY[id].bk || '').split('').filter(k => BOOKS[k]);
+function bookIcon(x){
+  const list = typeof x === 'string' && x.length > 1 && BY[x] ? bks(x) : x === 'both' ? ['b','m'] : x === 'bukhari' ? ['b'] : x === 'muslim' ? ['m'] : BOOKS[x] ? [x] : (BY[x] ? bks(x) : []);
+  const L = list.filter(k => k !== 'a' || list.length === 1).slice(0, 4);
+  return `<span class="bk">${(L.length ? L : ['a']).map(k => `<i style="background:${BOOKS[k].c}"></i>`).join('')}</span>`;
 }
-function bookShort(id){ return t(BY[id].t + 'Short'); }
-function bookBadge(id){ return `<span class="book">${bookIcon(BY[id].t)}${esc(bookShort(id))}</span>`; }
+function nums(id){
+  const r = BY[id].r || {};
+  return Object.keys(r).sort((a, b) => 'bmdtnik'.indexOf(a) - 'bmdtnik'.indexOf(b)).map(k => bname(k) + ' ' + r[k].join(', ')).join(' · ');
+}
+function bookShort(id){
+  const it = BY[id]; if (it.t === 'both') return t('bothShort');
+  const L = bks(id).filter(k => k !== 'a');
+  return L.length ? L.map(k => bname(k)).join(' · ') : t('otherBooks');
+}
+function bookFull(id){
+  const it = BY[id]; if (it.t === 'both') return t('bothL');
+  const L = bks(id).filter(k => k !== 'a');
+  return L.length ? L.map(k => bname(k, true)).join(' · ') : t('otherBooks');
+}
+const gradeTag = id => BY[id].g === 'h' ? `<span class="gr h">${t('gradeH')}</span>` : BY[id].g === 's' ? `<span class="gr s">${t('gradeS')}</span>` : '';
+function bookBadge(id){ return `<span class="book">${bookIcon(id)}${esc(bookShort(id))}</span>`; }
 
 /* ---------- lists ---------- */
 function listFor(type, key, q){
@@ -528,11 +570,12 @@ function listFor(type, key, q){
   if (type === 'saved') return S.saved.slice();
   if (type === 'day') return [key];
   if (type === 'search') return searchIds(q.q || '');
-  let arr = IDX.items;
+  let arr = VIS();
   if (type === 'theme') arr = arr.filter(i => i.th.includes(key));
   if (type === 'tier') arr = arr.filter(i => i.t === key);
+  if (type === 'book') arr = arr.filter(i => i.bk.includes(key));
   if (q.sub) arr = arr.filter(i => i.s.includes(q.sub));
-  if (q.tier) arr = arr.filter(i => i.t === q.tier);
+  if (q.tier) arr = arr.filter(i => q.tier === 'bm' ? i.t !== 'other' : i.t === q.tier);
   const rank = {}; if (type === 'theme' && TH[key]) TH[key].subs.forEach((s, n) => rank[s.id] = n);
   const subRank = i => type === 'theme' ? Math.min(99, ...i.s.map(s => rank[s] ?? 99)) : 0;
   const ess = new Set(IDX.paths.start.concat(IDX.paths.kids));
@@ -542,6 +585,7 @@ function listName(type, key){
   if (type === 'path') return t(key);
   if (type === 'theme') return TH[key] ? TH[key][S.set.ui === 'ur' ? 'ur' : 'en'] : '';
   if (type === 'tier') return t(key + 'L');
+  if (type === 'book') return bname(key, true);
   if (type === 'saved') return t('saved');
   if (type === 'day') return t('daily');
   if (type === 'search') return t('explore');
@@ -551,7 +595,7 @@ const norm = s => String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ًͯ
 let SIX = null;
 async function buildSearch(){
   await Promise.all(['en','ur','hi','ar'].map(async k => { if (!D[k]) D[k] = await getJSON(k); }));
-  SIX = IDX.items.map(i => {
+  SIX = IDX.items.filter(i => !i.h).map(i => {
     const parts = [];
     for (const l of TR) { const r = tx(i.id,l); if (r) parts.push(r[0], r[1]); }
     const a = tx(i.id,'ar'); if (a) parts.push(a[1]);
@@ -561,7 +605,7 @@ async function buildSearch(){
 function searchIds(q){
   q = norm(q).trim(); if (q.length < 2 || !SIX) return [];
   const words = q.split(/\s+/); const hits = [];
-  for (const [id, s] of SIX) if (words.every(w => s.includes(w))) hits.push(id);
+  for (const [id, s] of SIX) if (words.every(w => s.includes(w)) && (S.set.scope !== 'bm' || BY[id].t !== 'other')) hits.push(id);
   return hits.sort((a,b) => (tierOrder[BY[a].t]-tierOrder[BY[b].t]) || (BY[a].n - BY[b].n));
 }
 
@@ -620,7 +664,7 @@ function ring(n, total){
 function renderHome(){
   tabs('home'); nav();
   const pool = IDX.daily; const id = DAILY || pool[dayIndex() % pool.length];
-  const [sn, st] = pathProgress('start'), [kn, kt] = pathProgress('kids');
+  const [sn, st] = pathProgress('start'), [kn, kt] = pathProgress('kids'), [nn, nt] = pathProgress('nawawi'), [qn, qt] = pathProgress('qudsi');
   const last = S.last && BY[S.last.id] ? S.last : null;
   const rt = readToday();
   let html = header();
@@ -634,22 +678,30 @@ function renderHome(){
   }
   html += `<h2 class="sec">${t('journeys')}</h2><div class="jgrid">
     <button class="jr wide j-start pat" data-go="list/path/start"><span class="em">🌱</span><span class="jt"><b>${t('start')}</b><span class="d">${t('startS')}</span><span class="bar"><i style="width:${sn/st*100}%"></i></span><span class="pc">${sn} / ${st}</span></span></button>
+    <button class="jr j-naw pat" data-go="list/path/nawawi"><span class="em">📜</span><b>${t('nawawi')}</b><span class="d">${t('nawawiS')}</span><span class="bar"><i style="width:${nn/nt*100}%"></i></span><span class="pc">${nn} / ${nt}</span></button>
+    <button class="jr j-qud pat" data-go="list/path/qudsi"><span class="em">✨</span><b>${t('qudsi')}</b><span class="d">${t('qudsiS')}</span><span class="bar"><i style="width:${qn/qt*100}%"></i></span><span class="pc">${qn} / ${qt}</span></button>
     <button class="jr j-kids pat" data-go="list/path/kids"><span class="em">⭐</span><b>${t('kids')}</b><span class="d">${t('kidsS')}</span><span class="bar"><i style="width:${kn/kt*100}%"></i></span><span class="pc">${kn} / ${kt} ⭐</span></button>
     <button class="jr j-quiz pat" data-go="quiz"><span class="em">🧩</span><b>${t('quiz')}</b><span class="d">${t('quizS')}</span><span class="pc" style="margin-top:auto">🏆 ${S.quizBest || 0} / 5</span></button></div>`;
   html += `<h2 class="sec">${t('strongest')}</h2>` + tierChips();
-  html += `<h2 class="sec">${t('themes')} <small>${IDX.items.length} ${t('hadith')}</small></h2>` + themeGrid();
+  html += `<h2 class="sec">${t('themes')} <small>${VIS().length} ${t('hadith')}</small></h2>` + themeGrid();
   html += credit();
   $('#app').innerHTML = html;
   requestAnimationFrame(() => setTimeout(() => document.querySelectorAll('.ring .fg').forEach(c => c.style.strokeDashoffset = c.dataset.off), 60));
 }
+function bookCounts(){
+  const V = VIS(); const c = {both: V.filter(i => i.t === 'both').length};
+  BOOK_ORDER.forEach(k => c[k] = V.filter(i => i.bk.includes(k)).length);
+  return c;
+}
+function bookKeys(){ return ['both', ...BOOK_ORDER].filter(k => S.set.scope !== 'bm' || ['both','b','m'].includes(k)); }
 function tierChips(){
-  const counts = {both:0, bukhari:0, muslim:0}; IDX.items.forEach(i => counts[i.t]++);
-  return '<div class="tchips">' + ['both','bukhari','muslim'].map(k => `<button class="tchip" data-go="list/tier/${k}">${bookIcon(k)}<span>${t(k+'L')}</span><small style="color:var(--muted)">${counts[k]}</small></button>`).join('') + '</div>';
+  const c = bookCounts();
+  return '<div class="tchips">' + bookKeys().filter(k => c[k]).map(k => `<button class="tchip" data-go="list/${k==='both'?'tier':'book'}/${k}">${bookIcon(k)}<span>${k==='both' ? t('both') : bname(k, true)}</span><small style="color:var(--muted)">${c[k]}</small></button>`).join('') + '</div>';
 }
 function themeGrid(){
   return '<div class="grid">' + IDX.themes.map(th => {
-    const ids = IDX.items.filter(i => i.th.includes(th.key)); const n = ids.filter(i => S.read[i.id]).length;
-    return `<button class="tile pat t-${th.key}" data-go="list/theme/${th.key}"><span class="ti">${I[THEME_ICON[th.key]]}</span><b>${esc(th[S.set.ui==='ur'?'ur':'en'])}</b><small>${th.n} ${t('hadith')}</small><span class="tbar"><i style="width:${n/th.n*100}%"></i></span></button>`;
+    const ids = VIS().filter(i => i.th.includes(th.key)); const n = ids.filter(i => S.read[i.id]).length;
+    return `<button class="tile pat t-${th.key}" data-go="list/theme/${th.key}"><span class="ti">${I[THEME_ICON[th.key]]}</span><b>${esc(th[S.set.ui==='ur'?'ur':'en'])}</b><small>${ids.length} ${t('hadith')}</small><span class="tbar"><i style="width:${ids.length ? n/ids.length*100 : 0}%"></i></span></button>`;
   }).join('') + '</div>';
 }
 const credit = () => `<p class="credit">Hadith text, translations and explanations from <a href="https://hadeethenc.com" target="_blank" rel="noopener">HadeethEnc.com</a>, shown unchanged.<br>MyHadithApp v${VERSION}</p>`;
@@ -657,12 +709,12 @@ const credit = () => `<p class="credit">Hadith text, translations and explanatio
 /* ---------- explore ---------- */
 async function renderExplore(q){
   tabs('explore'); nav();
-  const counts = {both:0, bukhari:0, muslim:0}; IDX.items.forEach(i => counts[i.t]++);
+  const c = bookCounts();
   $('#app').innerHTML = `<div class="top"><div class="brand" style="font-size:1.4rem">${t('explore')}</div><div class="sp"></div><button class="ib" data-act="settings">${I.gear}</button></div>
     <label class="search">${I.search}<input id="sq" type="search" enterkeyhint="search" autocomplete="off" placeholder="${t('searchPh')}" value="${esc(q.q||'')}"></label>
     <div id="sres"></div><div id="sbody">
     <h2 class="sec">${t('strongest')}</h2><div class="tiers">` +
-    ['both','bukhari','muslim'].map(k => `<button class="tierc" data-go="list/tier/${k}">${bookIcon(k)}<span><b>${t(k+'L')} · ${counts[k]}</b><span>${t(k+'S')}</span></span></button>`).join('') +
+    bookKeys().filter(k => c[k]).map(k => `<button class="tierc" data-go="list/${k==='both'?'tier':'book'}/${k}">${bookIcon(k)}<span><b>${k==='both' ? t('bothL') : bname(k, true)} · ${c[k]}</b><span>${t('bk_' + k)}</span></span></button>`).join('') +
     `</div><h2 class="sec">${t('themes')}</h2>${themeGrid()}</div>`;
   const inp = $('#sq'); let tm;
   const run = async () => {
@@ -683,7 +735,7 @@ function rows(ids, type, key, q, numbered){
     const pl = primary(id); const th = themeOf(id);
     const done = type === 'path' && key === 'kids' ? S.stars[id] : S.read[id];
     return `<button class="row t-${th}" data-go="read/${type}/${key}/${id}${qstr(q)}"><span class="n ${done?'done':''}">${done ? '✓' : (numbered ? n+1 : '•')}</span>
-      <span class="tx"><b ${pl==='ur'?'class="ur" dir="rtl"':''}>${esc(tx(id,pl)[0])}</b><small>${bookIcon(BY[id].t)}${esc(bookShort(id))}${S.saved.includes(id) ? ' · ♥' : ''}</small></span></button>`;
+      <span class="tx"><b ${pl==='ur'?'class="ur" dir="rtl"':''}>${esc(tx(id,pl)[0])}</b><small>${bookIcon(id)}${esc(bookShort(id))}${gradeTag(id)}${S.saved.includes(id) ? ' · ♥' : ''}</small></span></button>`;
   }).join('') + '</div>';
 }
 
@@ -695,9 +747,9 @@ function renderList(type, key, q){
   const baseIds = type === 'theme' ? listFor(type, key, {}) : ids;
   const kids = type === 'path' && key === 'kids';
   const readN = baseIds.filter(i => kids ? S.stars[i] : S.read[i]).length;
-  const th = type === 'theme' ? key : type === 'path' ? (kids ? 'heart' : 'dhikr') : ({both:'heart', bukhari:'worship', muslim:'dhikr'}[key] || 'faith');
-  const icon = type === 'theme' ? I[THEME_ICON[key]] : type === 'tier' ? bookIcon(key).replace('class="bk"','class="bk" style="display:flex;gap:3px"') : `<span style="font-size:1.5rem">${kids ? '⭐' : '🌱'}</span>`;
-  const sub = type === 'path' ? t(key+'S') : type === 'tier' ? t(key+'S') : '';
+  const th = type === 'theme' ? key : type === 'path' ? ({kids:'heart', nawawi:'seerah', qudsi:'faith'}[key] || 'dhikr') : type === 'book' ? ({b:'worship', m:'dhikr', d:'seerah', t:'faith', n:'family', i:'life', k:'society'}[key]) : 'heart';
+  const icon = type === 'theme' ? I[THEME_ICON[key]] : (type === 'tier' || type === 'book') ? bookIcon(key).replace('class="bk"','class="bk" style="display:flex;gap:3px"') : `<span style="font-size:1.5rem">${({kids:'⭐', nawawi:'📜', qudsi:'✨'})[key] || '🌱'}</span>`;
+  const sub = type === 'path' ? t(key+'S') : type === 'tier' ? t(key+'S') : type === 'book' ? t('bk_' + key) : '';
   const firstUnread = ids.find(i => !(kids ? S.stars[i] : S.read[i])) || ids[0];
   let html = `<div class="top"><button class="ib" data-back>${I.back}</button><div class="sp"></div><button class="ib" data-act="settings">${I.gear}</button></div>
     <div class="lhead pat t-${th}"><span class="ti">${icon}</span><h1>${esc(listName(type, key))}</h1><p>${sub ? esc(sub) + '<br>' : ''}${readN} / ${baseIds.length} ${kids ? '⭐' : t('read')}</p>
@@ -706,7 +758,7 @@ function renderList(type, key, q){
   if (type === 'theme') {
     html += `<div class="chips"><button class="chip ${!q.sub?'on':''}" data-go="list/theme/${key}${qstr({tier:q.tier})}" data-keep>${t('all')}</button>` +
       TH[key].subs.map(s => `<button class="chip ${q.sub===s.id?'on':''}" data-go="list/theme/${key}${qstr({sub:s.id, tier:q.tier})}" data-keep>${esc(s[S.set.ui==='ur'?'ur':'en'])}</button>`).join('') + '</div>';
-    html += `<div class="chips" style="padding-top:4px">` + ['', 'both', 'bukhari', 'muslim'].map(tr => `<button class="chip ${(q.tier||'')===tr?'on':''}" data-go="list/theme/${key}${qstr({sub:q.sub, tier:tr})}" data-keep>${tr ? t(tr+'Short') : t('all')}</button>`).join('') + '</div>';
+    html += `<div class="chips" style="padding-top:4px">` + (S.set.scope === 'bm' ? ['', 'both', 'bukhari', 'muslim'] : ['', 'bm', 'both', 'other']).map(tr => `<button class="chip ${(q.tier||'')===tr?'on':''}" data-go="list/theme/${key}${qstr({sub:q.sub, tier:tr})}" data-keep>${tr ? ({bm:t('bmOnly'), both:t('both'), other:t('otherBooks'), bukhari:t('bukhariShort'), muslim:t('muslimShort')})[tr] : t('all')}</button>`).join('') + '</div>';
   }
   if (kids) html += `<div class="starrow">${IDX.paths.kids.map(i => `<span class="${S.stars[i]?'on':''}">⭐</span>`).join('')}</div>`;
   const lim = +(q.n || PAGE);
@@ -730,7 +782,9 @@ function langBar(){
 }
 function sourceCard(id){
   const it = BY[id]; const n = nums(id);
-  return `<div class="source">${bookIcon(it.t)}<div><b>${t(it.t+'L')}</b><span>${t(it.t+'S')}</span>${n ? `<span style="color:var(--text);font-weight:800">${t('no')} ${esc(n)}</span>` : ''}${it.t==='both' ? `<span class="lvl">★ ${t('top')}</span>` : ''}</div></div>`;
+  const sub = it.t === 'other' ? (bks(id).length ? t('narrBy') + ' ' + bks(id).map(k => bname(k)).join(', ') + '.' : ((tx(id,'en')||[])[5] || t('otherS'))) : t(it.t + 'S');
+  return `<div class="source">${bookIcon(id)}<div><b>${esc(bookFull(id))}</b><span>${esc(sub)}</span>${n ? `<span style="color:var(--text);font-weight:800">${t('no')} ${esc(n)}</span>` : ''}
+    <span class="tags2">${it.t==='both' ? `<span class="lvl">★ ${t('top')}</span>` : ''}${gradeTag(id)}</span>${it.g === 'h' ? `<span style="margin-top:6px">${t('hasanNote')}</span>` : ''}</div></div>`;
 }
 function panel(id){
   const {langs, miss} = trLangs(id); const ar = on('ar') && tx(id,'ar');
@@ -842,7 +896,7 @@ async function share(){
   if (!CUR) return;
   const id = CUR.id; const l = primary(id); const r = tx(id, l);
   const n = nums(id);
-  const text = `“${r[0]}”\n\n${t(BY[id].t+'L')}${n ? ' (' + n + ')' : ''}\nhttps://hadeethenc.com/${l}/browse/hadith/${id}`;
+  const text = `“${r[0]}”\n\n${bookFull(id)}${n ? ' (' + n + ')' : ''}\nhttps://hadeethenc.com/${l}/browse/hadith/${id}`;
   try { if (navigator.share) { await navigator.share({text}); return; } } catch(e) { if (e.name === 'AbortError') return; }
   try { await navigator.clipboard.writeText(text); toast(t('copied')); } catch(e) {}
 }
@@ -1021,6 +1075,7 @@ function openSheet(){
   const s = S.set; const m = IDX.meta;
   $('#sheet').innerHTML = `<div class="grab"></div><h2>${t('settings')}</h2>
     <div class="opt"><label>${t('showIn')}</label>${langBar()}</div>
+    <div class="opt"><label>${t('scope')}</label>${seg('scope', [['all',t('scopeAll')],['bm',t('scopeBM')]], s.scope || 'all')}</div>
     <div class="opt"><label>${t('size')}</label>${seg('size', [['0','A'],['1','<span style="font-size:1.12em">A</span>'],['2','<span style="font-size:1.25em">A</span>'],['3','<span style="font-size:1.4em">A</span>']], s.size)}</div>
     <div class="opt"><label>${t('look')}</label>${seg('look', [['auto',t('auto')],['light',t('light')],['dark',t('dark')]], s.look)}</div>
     <div class="opt"><label>${t('lang')}</label>${seg('ui', [['en','English'],['ur','اردو']], s.ui)}</div>
@@ -1051,6 +1106,7 @@ async function rerender(){
 }
 async function setOpt(name, v){
   if (name === 'size' || name === 'lRate') v = +v;
+  if (name === 'scope') SIX = null;
   if (name === 'lMean' || name === 'lAuto') v = v === '1';
   S.set[name] = v;
   if (name === 'ui' && v === 'ur' && !on('ur')) S.set.langs.push('ur');

@@ -11,9 +11,34 @@ src = json.load(open(os.path.join(ROOT, 'work/all.json')))
 OUT = os.path.join(ROOT, 'app/data')
 os.makedirs(OUT, exist_ok=True)
 
-# The 665xx series repeats hadith already in the main series (a Nawawi-based set); skip to avoid duplicates.
-items = [x for x in src['items'] if not 66500 <= int(x['id']) <= 66560]
+import curation  # noqa: E402  (local module with hand-picked id lists)
+
+# Library: graded Sahih or Hasan by HadeethEnc and narrated in one of the seven main books.
+# The 665xx series repeats hadith already in the main series (HadeethEnc's Nawawi set): kept only for the
+# Nawawi journey, hidden from lists and search to avoid duplicates. Path hadith outside the library are kept hidden too.
+SEVEN = set('bmdtnik')
+allby = {x['id']: x for x in src['items']}
+paths_ids = set(curation.START + curation.KIDS + curation.NAWAWI + curation.QUDSI)
+items, hidden = [], set()
+for x in src['items']:
+    inlib = bool(x['gc']) and bool(set(x['books']) & SEVEN) and not 66500 <= int(x['id']) <= 66560
+    if inlib or x['id'] in paths_ids:
+        items.append(x)
+        if not inlib:
+            hidden.add(x['id'])
 byid = {x['id']: x for x in items}
+NUMS = json.load(open(os.path.join(ROOT, 'work/nums.json')))
+
+
+def tier(x):
+    b = set(x['books'])
+    if {'b', 'm'} <= b:
+        return 'both'
+    if 'b' in b:
+        return 'bukhari'
+    if 'm' in b:
+        return 'muslim'
+    return 'other'
 
 cats_en = {c['id']: c for c in src['cats']['en']}
 cats_ur = {c['id']: c for c in src['cats']['ur']}
@@ -41,11 +66,11 @@ THEMES = [
     ('society', ['6', '127', '128', '129', '132', '4'], 'Society & rulings', 'معاشرہ و احکام'),
 ]
 
-import curation  # noqa: E402  (local module with hand-picked id lists)
 import re
 from hinglish import to_hinglish
 
-BOOK = {'b': 'صحيح البخاري', 'm': 'صحيح مسلم'}
+BOOK = {'b': 'صحيح البخاري', 'm': 'صحيح مسلم', 'd': 'سنن أبي داود', 't': 'سنن الترمذي', 'n': 'سنن النسائي',
+        'i': 'سنن ابن ماجه', 'k': 'موطأ مالك'}
 SEG = re.compile(r'(?:\s*[،,]?\s*و?\s*\(\s*[\d\s]+/\s*\d+\s*\)\s*\(([\d\s\-–,،]+)\))')
 
 
@@ -95,14 +120,23 @@ for x in items:
     if not th:
         th = ['society']
     assigned[x['id']] = th
-    item_out.append({'id': x['id'], 't': x['tier'], 'th': th, 's': sorted(set(subs), key=int),
-                     'f': 1 if '4' in anc else 0, 'u': 1 if 'ur' in x else 0,
-                     'n': len(x['en']['text']), 'r': refs(x.get('ref', ''))})
+    # hadith numbers: HadeethEnc's own references first, else matched by Arabic text (score >= 0.5)
+    r = refs(x.get('ref', ''))
+    for k, v in NUMS.get(x['id'], {}).items():
+        if k in x['books'] and k not in r and v['s'] >= 0.5:
+            r[k] = v['n'][:1]
+    r = {k: v for k, v in r.items() if k in x['books']}
+    rec = {'id': x['id'], 't': tier(x), 'bk': ''.join(b for b in 'bmdtnika' if b in x['books']),
+           'g': 'h' if x['gc'] == 'hasan' else 's' if x['gc'] == 'sahih' else '', 'th': th, 's': sorted(set(subs), key=int),
+           'f': 1 if '4' in anc else 0, 'n': len(x['en']['text']), 'r': r}
+    if x['id'] in hidden:
+        rec['h'] = 1
+    item_out.append(rec)
 
 for key, roots, en, ur in THEMES:
     if key == 'society':
         roots = ['6', '127', '128', '129', '132']
-    members = [i for i in item_out if key in i['th']]
+    members = [i for i in item_out if key in i['th'] and not i.get('h')]
     subcount = {}
     for i in members:
         for s in i['s']:
@@ -114,20 +148,20 @@ for key, roots, en, ur in THEMES:
     themes_out.append({'key': key, 'en': en, 'ur': ur, 'n': len(members), 'subs': subs})
 
 # Curated paths: verify every id exists in the authentic subset
-for name, ids in (('start', curation.START), ('kids', curation.KIDS)):
+for name, ids in (('start', curation.START), ('kids', curation.KIDS), ('nawawi', curation.NAWAWI), ('qudsi', curation.QUDSI)):
     missing = [i for i in ids if i not in byid]
     assert not missing, (name, missing)
     assert len(ids) == len(set(ids)), name
 
 # Hadith of the day pool: curated + short "agreed upon" hadith
 pool = list(dict.fromkeys(curation.START + curation.KIDS +
-                          [i['id'] for i in item_out if i['t'] == 'both' and i['n'] <= 600 and i['id'] not in ('1751',)]))
+                          [i['id'] for i in item_out if i['t'] == 'both' and i['n'] <= 600 and not i.get('h') and i['id'] not in ('1751',)]))
 
 index = {
     'meta': src['meta'],
     'themes': themes_out,
     'items': item_out,
-    'paths': {'start': curation.START, 'kids': curation.KIDS},
+    'paths': {'start': curation.START, 'kids': curation.KIDS, 'nawawi': curation.NAWAWI, 'qudsi': curation.QUDSI},
     'daily': pool,
 }
 json.dump(index, open(os.path.join(OUT, 'index.json'), 'w'), ensure_ascii=False, separators=(',', ':'))
@@ -144,6 +178,8 @@ json.dump(d, open(os.path.join(OUT, 'ar.json'), 'w'), ensure_ascii=False, separa
 
 for f in os.listdir(OUT):
     print(f, round(os.path.getsize(os.path.join(OUT, f)) / 1e6, 2), 'MB')
-print(len(item_out), 'hadith; pool', len(pool))
+import collections
+print(len(item_out), 'hadith;', len(hidden), 'hidden; pool', len(pool), collections.Counter((i['t'], i['g']) for i in item_out if not i.get('h')))
+print('with numbers', sum(1 for i in item_out if i['r'] and not i.get('h')), 'missing in paths:', [i for i in curation.NAWAWI + curation.QUDSI if i in hidden])
 for t in themes_out:
     print(t['key'], t['n'], [s['en'] for s in t['subs']][:8])

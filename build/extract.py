@@ -3,7 +3,7 @@
 Selection: grade 'صحيح' and narrated by Bukhari, Muslim, or both (متفق عليه).
 Output: work/all.json
 """
-import glob, json, os, sys
+import glob, json, os, re, sys
 import openpyxl
 
 SRC = sys.argv[1]  # path to hadeethenc-mirror checkout
@@ -40,15 +40,49 @@ info_ur, ver_ur, ur = load('ur')
 info_hi, ver_hi, hi = load('hi')
 api = {str(x['id']): x for x in json.load(open(os.path.join(SRC, 'source/api/hadeeths-ar.json')))}
 
+BOOKS_AR = [('b', 'البخاري'), ('m', 'مسلم'), ('d', 'أبو داود'), ('t', 'الترمذي'), ('n', 'النسائي'), ('i', 'ابن ماجه'), ('k', 'مالك'), ('a', 'أحمد')]
+
+
+NOT_MAIN = re.compile(r'البخاري في (الأدب المفرد|خلق أفعال العباد|التاريخ الكبير)|النسائي في (السنن )?الكبرى')
+
+
+def books_of(tk):
+    tk = (tk or '').split('تنبيه')[0]
+    tk = re.sub(r'[^،,\n]*(تعليق|أصله)[^،,\n]*', '', tk)   # suspended (mu'allaq) mentions or "its origin is in..."
+    tk = NOT_MAIN.sub('', tk)
+    found = set()
+    if 'متفق عليه' in tk:
+        found |= {'b', 'm'}
+    for k, name in BOOKS_AR:
+        if name in tk:
+            found.add(k)
+    if 'البخاري' in tk and 'مسلم' in tk:
+        found |= {'b', 'm'}
+    return found
+
+
+def grade_class(g):
+    g = (g or '').strip()
+    if not g or 'ضعيف' in g or 'موقوف' in g:
+        return None
+    if g.startswith('صحيح') or g.startswith('إسناده صحيح') or g.startswith('سنده صحيح') or g == 'صحيحة' or g.startswith('الحديثان صحيحان') or g.startswith('صحيحان'):
+        return 'sahih'
+    if g.startswith('حسن') or g.startswith('إسناده حسن') or 'حديث حسن' in g or 'بإسناد حسن' in g:
+        return 'hasan'
+    if 'حديث صحيح' in g or 'بإسناد صحيح' in g:
+        return 'sahih'
+    return None
+
+
 out = []
 for i, r in en.items():
-    tier = TIERS.get((r['takhrij_ar'] or '').strip())
-    if (r['grade_ar'] or '').strip() != 'صحيح' or not tier:
-        continue
+    bk = books_of(r['takhrij_ar'])
+    gc = grade_class(r['grade_ar'])
     a = api.get(i, {})
     item = {
         'id': i,
-        'tier': tier,
+        'books': sorted(bk),
+        'gc': gc,
         'cats': a.get('categories', []),
         'ar': {'title': clean(r['title_ar']), 'text': clean(r['hadith_text_ar']),
                'grade': clean(r['grade_ar']), 'takhrij': clean(r['takhrij_ar'])},
@@ -70,4 +104,4 @@ out.sort(key=lambda x: int(x['id']))
 meta = {'en': {'version': ver_en, 'info': info_en}, 'ur': {'version': ver_ur, 'info': info_ur}, 'hi': {'version': ver_hi, 'info': info_hi}}
 cats = {lang: json.load(open(os.path.join(SRC, f'source/api/categories/{lang}.json'))) for lang in ('en', 'ur')}
 json.dump({'meta': meta, 'cats': cats, 'items': out}, open(os.path.join(OUT, 'all.json'), 'w'), ensure_ascii=False)
-print(len(out), 'hadith;', sum('ur' in x for x in out), 'with Urdu;', ver_en, ver_ur)
+print(len(out), 'hadith (all);', sum('ur' in x for x in out), 'with Urdu;', ver_en, ver_ur)
