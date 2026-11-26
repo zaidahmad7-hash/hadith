@@ -28,6 +28,8 @@ for x in src['items']:
             hidden.add(x['id'])
 byid = {x['id']: x for x in items}
 NUMS = json.load(open(os.path.join(ROOT, 'work/nums.json')))
+from muslim_check import load as load_muslim, suspicious
+MGROUPS, MCHAIN = load_muslim('/home/claude/src/hapi')
 
 
 def tier(x):
@@ -124,6 +126,8 @@ for x in items:
     r = refs(x.get('ref', ''))
     for k, v in NUMS.get(x['id'], {}).items():
         if k in x['books'] and k not in r and v['s'] >= 0.5:
+            if k == 'm' and suspicious(v['n'][0], MGROUPS, MCHAIN):
+                continue   # near a spot where the matching dataset's Muslim numbering drifts: show no number
             r[k] = v['n'][:1]
     r = {k: v for k, v in r.items() if k in x['books']}
     rec = {'id': x['id'], 't': tier(x), 'bk': ''.join(b for b in 'bmdtnika' if b in x['books']),
@@ -131,6 +135,9 @@ for x in items:
            'f': 1 if '4' in anc else 0, 'n': len(x['en']['text']), 'r': r}
     if x['id'] in hidden:
         rec['h'] = 1
+    tk = x['ar']['takhrij']
+    if rec['t'] == 'both' and ('متفق علي' in tk or tk.startswith('رواه البخاري ومسلم')):
+        rec['mu'] = 1   # HadeethEnc calls it "agreed upon" (متفق عليه)
     item_out.append(rec)
 
 for key, roots, en, ur in THEMES:
@@ -155,7 +162,7 @@ for name, ids in (('start', curation.START), ('kids', curation.KIDS), ('nawawi',
 
 # Hadith of the day pool: curated + short "agreed upon" hadith
 pool = list(dict.fromkeys(curation.START + curation.KIDS +
-                          [i['id'] for i in item_out if i['t'] == 'both' and i['n'] <= 600 and not i.get('h') and i['id'] not in ('1751',)]))
+                          [i['id'] for i in item_out if i['t'] == 'both' and i.get('mu') and i['n'] <= 600 and not i.get('h') and not i['f']]))
 
 index = {
     'meta': src['meta'],

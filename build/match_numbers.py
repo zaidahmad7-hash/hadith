@@ -22,15 +22,30 @@ def shingles(words, k=4):
     return {' '.join(words[i:i + k]) for i in range(len(words) - k + 1)}
 
 
-index, df, nums, size = {}, collections.Counter(), {}, {}
+index, df, nums, size, TEXT = {}, collections.Counter(), {}, {}, {}
+COMP = re.compile(r'^\s*(?:وعن|عن)\s+(.{3,60}?)\s*(?:-|\(|رضي|رضى|قال|،|:)')
+
+
+def companion(text):
+    """First narrator named by HadeethEnc (the Companion), as normalised words; [] if not found."""
+    m = COMP.match(DIAC.sub('', text or ''))
+    if not m:
+        return []
+    w = [x for x in norm(m.group(1)) if x not in ('بن', 'ابن', 'بنت', 'ام', 'ابي', 'ابو', 'عبد')]
+    return w[:2]
+
 for key, book in BOOKS.items():
     d = json.load(open(f'{HAPI}/ara-{book}1.json'))['hadiths']
     inv = collections.defaultdict(set)
     for h in d:
+        if key == 'm' and not h.get('arabicnumber'):
+            continue   # Muslim is cited by Abdul-Baqi numbers (arabicnumber); skip entries without one
         num = h.get('arabicnumber') or h['hadithnumber']
         num = int(float(num))
         uid = (key, num)
-        shs = shingles(norm(h['text']))
+        words = norm(h['text'])
+        TEXT[uid] = ' '.join(words)
+        shs = shingles(words)
         size[uid] = max(size.get(uid, 0), len(shs))
         for sh in shs:
             inv[sh].add(uid)
@@ -53,7 +68,12 @@ for it in data:
             for uid in inv.get(s, ()):
                 c[uid] += 1
         scored = sorted(((uid[1], max(n / len(q), n / max(size[uid], 1)) if n >= 6 else n / len(q)) for uid, n in c.most_common(12)), key=lambda x: -x[1])
-        hits = [(num, sc) for num, sc in scored if sc >= 0.35]
+        comp = companion(it['ar']['text'])
+        def same_companion(num):
+            t = TEXT.get((key, num), '')
+            return all(w in t for w in comp) if comp else True
+        # a weak match must also name the same Companion in its chain
+        hits = [(num, sc) for num, sc in scored if sc >= 0.35 and (sc >= 0.8 or same_companion(num))]
         if hits:
             best = hits[0][1]
             res[key] = {'n': [n for n, sc in hits if sc >= best - 0.05][:3], 's': round(best, 3)}

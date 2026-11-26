@@ -364,7 +364,7 @@ body.pl #app{padding-bottom:calc(var(--safeB) + 180px)}
 <div id="player"></div>
 <script>
 'use strict';
-const VERSION = '3.0';
+const VERSION = '3.1';
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
@@ -406,12 +406,12 @@ const T = {
   themes:'Topics',strongest:'By book',hadith:'hadith',home:'Home',explore:'Explore',saved:'Saved',all:'All',
   bothL:'Sahih al-Bukhari & Sahih Muslim',bukhariL:'Sahih al-Bukhari',muslimL:'Sahih Muslim',
   bothS:'Agreed upon (Muttafaq ʿalayh): narrated by both. The highest level of authenticity.',bukhariS:'Narrated by Imam al-Bukhari. Authentic (Sahih).',muslimS:'Narrated by Imam Muslim. Authentic (Sahih).',
-  both:'Agreed upon',otherBooks:'Other books',otherS:'Narrated in other hadith books.',narrBy:'Narrated by',bmOnly:'Bukhari & Muslim',
+  both:'In both books',bothS2:'Narrated by both Imam al-Bukhari and Imam Muslim.',otherBooks:'Other books',otherS:'Narrated in other hadith books.',narrBy:'Narrated by',bmOnly:'Bukhari & Muslim',
   gradeS:'Sahih',gradeH:'Hasan',hasanNote:'Hasan (good): an accepted, reliable hadith, one level below Sahih.',
   nawawi:"Imam Nawawi's 40",nawawiS:'The 42 foundational hadith collected by Imam an-Nawawi',qudsi:'Hadith Qudsi',qudsiS:'The Prophet ﷺ tells us what Allah said',
   scope:'Show hadith from',scopeAll:'All authentic books',scopeBM:'Bukhari & Muslim only',
-  bk_both:'Agreed upon: narrated by both. The highest level.',bk_b:'Collected by Imam al-Bukhari (d. 256 AH).',bk_m:'Collected by Imam Muslim (d. 261 AH).',bk_d:'Collected by Imam Abu Dawud (d. 275 AH).',bk_t:'Collected by Imam at-Tirmidhi (d. 279 AH).',bk_n:"Collected by Imam an-Nasa'i (d. 303 AH).",bk_i:'Collected by Imam Ibn Majah (d. 273 AH).',bk_k:'Collected by Imam Malik (d. 179 AH).',
-  bothShort:'Bukhari & Muslim',bukhariShort:'Bukhari',muslimShort:'Muslim',top:'Highest level',no:'No.',
+  bk_both:'Narrated by both Imam al-Bukhari and Imam Muslim.',bk_b:'Collected by Imam al-Bukhari (d. 256 AH).',bk_m:'Collected by Imam Muslim (d. 261 AH).',bk_d:'Collected by Imam Abu Dawud (d. 275 AH).',bk_t:'Collected by Imam at-Tirmidhi (d. 279 AH).',bk_n:"Collected by Imam an-Nasa'i (d. 303 AH).",bk_i:'Collected by Imam Ibn Majah (d. 273 AH).',bk_k:'Collected by Imam Malik (d. 179 AH).',
+  noneHere:'No hadith here with this filter. Try another one.',bothShort:'Bukhari & Muslim',bukhariShort:'Bukhari',muslimShort:'Muslim',top:'Highest level',no:'No.',
   tH:'Hadith',tM:'Meaning',tL:'Lessons',markRead:'Mark as read',isRead:'Read',next:'Next',finish:'Finish',
   learnt:'I learnt this!',gotStar:'Star collected!',searchPh:'Search in English, Urdu, Hinglish or Arabic…',
   noSaved:'Tap the heart on any hadith to keep it here.',noRes:'No hadith found. Try another word.',noLessons:'No lessons listed for this hadith in this language yet.',
@@ -422,7 +422,7 @@ const T = {
   results:'results',done:'Well done! You finished this journey.',backHome:'Back to home',reset:'Reset progress',swipe:'Swipe left or right for the next hadith',
   resetQ:'Reset all reading progress, stars and saved hadith on this phone?',share:'Share',keepOne:'Keep at least one translation on',
   qTitle:'Which word is missing?',qRight:'Correct! ⭐',qWrong:'Not quite. The answer is shown.',qNext:'Next question',qDone:'Quiz finished!',qScore:'You got',qAgain:'Play again',qRead:'Read this hadith',
-  aboutText:'<b>MyHadithApp</b> shows only hadith graded <b>Sahih (authentic)</b> and narrated by <b>al-Bukhari and/or Muslim</b>, the two most authentic hadith books. The hadith text, translations, explanations and lessons come from <b>HadeethEnc.com</b> (Encyclopedia of Translated Prophetic Hadiths) and are shown exactly as published. <b>Hinglish</b> is HadeethEnc’s Hindi translation written in Roman letters by the app automatically (same words, different script), so some spellings may look unusual. Hadith numbers are shown where HadeethEnc lists them. Your progress stays on this phone. No ads, no tracking.',
+  aboutText:'<b>MyHadithApp</b> shows hadith graded <b>Sahih (authentic)</b> or <b>Hasan (good)</b> from seven books: Sahih al-Bukhari, Sahih Muslim, Sunan Abi Dawud, Jami\u2018 at-Tirmidhi, Sunan an-Nasa\u2019i, Sunan Ibn Majah and Muwatta Malik. Every hadith is labelled with its book(s) and grade, and Settings lets you show only Bukhari & Muslim. Imam Nawawi\u2019s 40 keeps all 42 of his hadith, including a few from other books, each labelled. The hadith text, translations, explanations, lessons and grades come from <b>HadeethEnc.com</b> (Encyclopedia of Translated Prophetic Hadiths) and are shown exactly as published. <b>Hinglish</b> is HadeethEnc\u2019s Hindi translation written in Roman letters by the app automatically (same words, different script), so some spellings may look unusual. Hadith numbers come from HadeethEnc\u2019s references, or else from matching the Arabic text against the full collections; a number is left out when the match is not certain. Your progress stays on this phone. No ads, no tracking.',
   updates:'Content versions',edit:'Spotted a mistake in a translation? Please report it to HadeethEnc.com.',
   listen:'Listen',listening:'Listening',lIn:'Listen in',lMean:'Also read the meaning',lAuto:'Continue to the next hadith',lRate:'Speed',onW:'On',offW:'Off',
   mArabic:'Arabic',mEnglish:'English',mUrdu:'Urdu / Hindi',lHadith:'Hadith',lMeaning:'Meaning',noVoice:'No voice for this language on this phone. See Settings → Listening.',
@@ -434,12 +434,12 @@ const T = {
   themes:'موضوعات',strongest:'کتاب کے لحاظ سے',hadith:'احادیث',home:'ہوم',explore:'تلاش',saved:'محفوظ',all:'سب',
   bothL:'صحیح بخاری و صحیح مسلم',bukhariL:'صحیح بخاری',muslimL:'صحیح مسلم',
   bothS:'متفق علیہ: دونوں نے روایت کی۔ صحت کا سب سے اونچا درجہ۔',bukhariS:'امام بخاری کی روایت۔ صحیح۔',muslimS:'امام مسلم کی روایت۔ صحیح۔',
-  both:'متفق علیہ',otherBooks:'دیگر کتب',otherS:'دیگر کتبِ حدیث میں مروی۔',narrBy:'روایت:',bmOnly:'بخاری و مسلم',
+  both:'دونوں کتب میں',bothS2:'امام بخاری اور امام مسلم دونوں نے روایت کی۔',otherBooks:'دیگر کتب',otherS:'دیگر کتبِ حدیث میں مروی۔',narrBy:'روایت:',bmOnly:'بخاری و مسلم',
   gradeS:'صحیح',gradeH:'حسن',hasanNote:'حسن: مقبول اور قابلِ اعتماد حدیث، صحیح سے ایک درجہ کم۔',
   nawawi:'اربعین نووی',nawawiS:'امام نووی کی جمع کردہ ۴۲ بنیادی احادیث',qudsi:'احادیثِ قدسیہ',qudsiS:'نبی ﷺ اللہ تعالیٰ کا فرمان بیان فرماتے ہیں',
   scope:'احادیث دکھائیں',scopeAll:'تمام مستند کتب',scopeBM:'صرف بخاری و مسلم',
-  bk_both:'متفق علیہ: دونوں نے روایت کی۔ سب سے اونچا درجہ۔',bk_b:'امام بخاری (وفات ۲۵۶ھ) کی جمع کردہ۔',bk_m:'امام مسلم (وفات ۲۶۱ھ) کی جمع کردہ۔',bk_d:'امام ابو داود (وفات ۲۷۵ھ) کی جمع کردہ۔',bk_t:'امام ترمذی (وفات ۲۷۹ھ) کی جمع کردہ۔',bk_n:'امام نسائی (وفات ۳۰۳ھ) کی جمع کردہ۔',bk_i:'امام ابن ماجہ (وفات ۲۷۳ھ) کی جمع کردہ۔',bk_k:'امام مالک (وفات ۱۷۹ھ) کی جمع کردہ۔',
-  bothShort:'بخاری و مسلم',bukhariShort:'بخاری',muslimShort:'مسلم',top:'اعلیٰ درجہ',no:'نمبر',
+  bk_both:'امام بخاری اور امام مسلم دونوں نے روایت کی۔',bk_b:'امام بخاری (وفات ۲۵۶ھ) کی جمع کردہ۔',bk_m:'امام مسلم (وفات ۲۶۱ھ) کی جمع کردہ۔',bk_d:'امام ابو داود (وفات ۲۷۵ھ) کی جمع کردہ۔',bk_t:'امام ترمذی (وفات ۲۷۹ھ) کی جمع کردہ۔',bk_n:'امام نسائی (وفات ۳۰۳ھ) کی جمع کردہ۔',bk_i:'امام ابن ماجہ (وفات ۲۷۳ھ) کی جمع کردہ۔',bk_k:'امام مالک (وفات ۱۷۹ھ) کی جمع کردہ۔',
+  noneHere:'اس فلٹر کے ساتھ یہاں کوئی حدیث نہیں۔ کوئی اور آزمائیں۔',bothShort:'بخاری و مسلم',bukhariShort:'بخاری',muslimShort:'مسلم',top:'اعلیٰ درجہ',no:'نمبر',
   tH:'حدیث',tM:'مطلب',tL:'اسباق',markRead:'پڑھ لی',isRead:'پڑھ لی',next:'اگلی',finish:'مکمل',
   learnt:'میں نے سیکھ لیا!',gotStar:'ستارہ مل گیا!',searchPh:'اردو، انگریزی، ہنگلش یا عربی میں تلاش کریں…',
   noSaved:'کسی بھی حدیث پر دل کا نشان دبائیں، وہ یہاں محفوظ ہو جائے گی۔',noRes:'کوئی حدیث نہیں ملی۔ کوئی اور لفظ آزمائیں۔',noLessons:'اس زبان میں اس حدیث کے اسباق ابھی موجود نہیں۔',
@@ -450,7 +450,7 @@ const T = {
   results:'نتائج',done:'ماشاء اللہ! آپ نے یہ سفر مکمل کر لیا۔',backHome:'واپس',reset:'پیش رفت صاف کریں',swipe:'اگلی حدیث کے لیے دائیں یا بائیں سوائپ کریں',
   resetQ:'اس فون پر پڑھنے کی پیش رفت، ستارے اور محفوظ احادیث صاف کر دیں؟',share:'شیئر',keepOne:'کم از کم ایک ترجمہ رکھیں',
   qTitle:'کون سا لفظ غائب ہے؟',qRight:'شاباش! ⭐',qWrong:'صحیح جواب دکھا دیا گیا۔',qNext:'اگلا سوال',qDone:'کوئز مکمل!',qScore:'آپ کے نمبر',qAgain:'دوبارہ کھیلیں',qRead:'یہ حدیث پڑھیں',
-  aboutText:'<b>MyHadithApp</b> میں صرف وہ احادیث ہیں جو <b>صحیح</b> ہیں اور <b>امام بخاری اور/یا امام مسلم</b> نے روایت کی ہیں۔ حدیث کا متن، ترجمہ، شرح اور اسباق <b>HadeethEnc.com</b> سے لیے گئے ہیں اور بغیر تبدیلی کے دکھائے گئے ہیں۔ <b>ہنگلش</b> دراصل HadeethEnc کا ہندی ترجمہ ہے جسے ایپ خود رومن حروف میں لکھتی ہے۔ آپ کی پیش رفت صرف اسی فون پر رہتی ہے۔ کوئی اشتہار نہیں۔',
+  aboutText:'<b>MyHadithApp</b> میں سات کتب کی <b>صحیح</b> اور <b>حسن</b> احادیث ہیں: صحیح بخاری، صحیح مسلم، سنن ابی داود، جامع ترمذی، سنن نسائی، سنن ابن ماجہ اور موطا امام مالک۔ ہر حدیث پر اس کی کتاب اور درجہ لکھا ہے، اور ترتیبات میں صرف بخاری و مسلم دکھانے کا اختیار ہے۔ حدیث کا متن، ترجمہ، شرح، اسباق اور درجہ <b>HadeethEnc.com</b> سے لیے گئے ہیں اور بغیر تبدیلی کے دکھائے گئے ہیں۔ <b>ہنگلش</b> دراصل HadeethEnc کا ہندی ترجمہ ہے جسے ایپ خود رومن حروف میں لکھتی ہے۔ حدیث نمبر HadeethEnc کے حوالوں سے، ورنہ عربی متن کو مکمل کتب سے ملا کر لیے گئے ہیں؛ جہاں یقین نہ ہو وہاں نمبر نہیں دکھایا جاتا۔ آپ کی پیش رفت صرف اسی فون پر رہتی ہے۔ کوئی اشتہار نہیں۔',
   updates:'مواد کے ورژن',edit:'ترجمے میں غلطی نظر آئے تو HadeethEnc.com کو اطلاع دیں۔',
   listen:'سنیں',listening:'سن رہے ہیں',lIn:'سننے کی زبان',lMean:'مطلب بھی سنائیں',lAuto:'اگلی حدیث خود چلائیں',lRate:'رفتار',onW:'ہاں',offW:'نہیں',
   mArabic:'عربی',mEnglish:'انگریزی',mUrdu:'اردو / ہندی',lHadith:'حدیث',lMeaning:'مطلب',noVoice:'اس فون میں اس زبان کی آواز نہیں ہے۔ ترتیبات دیکھیں۔',
@@ -591,7 +591,8 @@ function listName(type, key){
   if (type === 'search') return t('explore');
   return '';
 }
-const norm = s => String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ًͯ-ٰٟۖ-ۭـ]/g,'').replace(/[‘’ʿʾ`']/g,'');
+const UKUS = [['neighbour','neighbor'],['honour','honor'],['behaviour','behavior'],['colour','color'],['favour','favor'],['labour','labor'],['rumour','rumor'],['harbour','harbor'],['judgement','judgment'],['practise','practice']];
+const norm = s => UKUS.reduce((a, [u, v]) => a.split(u).join(v), String(s||'').toLowerCase()).normalize('NFD').replace(/[̀-ًͯ-ٰٟۖ-ۭـ]/g,'').replace(/[‘’ʿʾ`']/g,'');
 let SIX = null;
 async function buildSearch(){
   await Promise.all(['en','ur','hi','ar'].map(async k => { if (!D[k]) D[k] = await getJSON(k); }));
@@ -762,6 +763,7 @@ function renderList(type, key, q){
   }
   if (kids) html += `<div class="starrow">${IDX.paths.kids.map(i => `<span class="${S.stars[i]?'on':''}">⭐</span>`).join('')}</div>`;
   const lim = +(q.n || PAGE);
+  if (!ids.length) html += `<div class="empty"><div class="big">📭</div>${t('noneHere')}</div>`;
   html += rows(ids.slice(0, type==='path' ? 999 : lim), type, key, Object.assign({}, q, {n: ''}), type === 'path');
   if (type !== 'path' && ids.length > lim) html += `<button class="more" data-go="list/${type}/${key}${qstr(Object.assign({}, q, {n: lim + PAGE}))}" data-keep data-noscroll>+ ${Math.min(PAGE, ids.length - lim)}</button>`;
   $('#app').innerHTML = html;
@@ -782,9 +784,9 @@ function langBar(){
 }
 function sourceCard(id){
   const it = BY[id]; const n = nums(id);
-  const sub = it.t === 'other' ? (bks(id).length ? t('narrBy') + ' ' + bks(id).map(k => bname(k)).join(', ') + '.' : ((tx(id,'en')||[])[5] || t('otherS'))) : t(it.t + 'S');
+  const sub = (it.t === 'both' && !it.mu) ? t('bothS2') : it.t === 'other' ? (bks(id).length ? t('narrBy') + ' ' + bks(id).map(k => bname(k)).join(', ') + '.' : ((tx(id,'en')||[])[5] || t('otherS'))) : t(it.t + 'S');
   return `<div class="source">${bookIcon(id)}<div><b>${esc(bookFull(id))}</b><span>${esc(sub)}</span>${n ? `<span style="color:var(--text);font-weight:800">${t('no')} ${esc(n)}</span>` : ''}
-    <span class="tags2">${it.t==='both' ? `<span class="lvl">★ ${t('top')}</span>` : ''}${gradeTag(id)}</span>${it.g === 'h' ? `<span style="margin-top:6px">${t('hasanNote')}</span>` : ''}</div></div>`;
+    <span class="tags2">${it.t==='both' && it.mu ? `<span class="lvl">★ ${t('top')}</span>` : ''}${gradeTag(id)}</span>${it.g === 'h' ? `<span style="margin-top:6px">${t('hasanNote')}</span>` : ''}</div></div>`;
 }
 function panel(id){
   const {langs, miss} = trLangs(id); const ar = on('ar') && tx(id,'ar');
@@ -910,12 +912,12 @@ function words(s){ return String(s).split(/\s+/).map(w => w.replace(/^[^\p{L}]+|
 function newQuiz(){
   const lang = quizLang();
   const pool = IDX.paths.kids.concat(IDX.paths.start).filter((v, i, a) => a.indexOf(v) === i && tx(v, lang) && tx(v, lang)[0].length < 170);
-  const pick = pool.sort(() => Math.random() - .5).slice(0, 5);
-  QZ = {lang, i: 0, score: 0, res: [], qs: pick.map(id => {
+  const usable = pool.filter(id => words(tx(id, lang)[0]).length);
+  QZ = {lang, i: 0, score: 0, res: [], qs: usable.sort(() => Math.random() - .5).slice(0, 5).map(id => {
     const line = tx(id, lang)[0]; const ws = words(line);
     const ans = ws.sort((a, b) => b.length - a.length)[Math.floor(Math.random() * Math.min(3, ws.length))] || ws[0];
     const others = pool.filter(x => x !== id).flatMap(x => words(tx(x, lang)[0])).filter(w => w.toLowerCase() !== (ans||'').toLowerCase());
-    const opts = [ans]; while (opts.length < 3 && others.length) { const w = others.splice(Math.floor(Math.random()*others.length), 1)[0]; if (!opts.some(o => o.toLowerCase() === w.toLowerCase())) opts.push(w); }
+    const opts = [ans]; while (opts.length < 3 && others.length) { const w = others.splice(Math.floor(Math.random()*others.length), 1)[0]; if (w && !opts.some(o => o.toLowerCase() === w.toLowerCase())) opts.push(w); }
     return {id, line, ans, opts: opts.sort(() => Math.random() - .5)};
   }).filter(q => q.ans)};
 }
@@ -984,6 +986,8 @@ function segsFor(id){
   const segs = [];
   const add = (txt, lang, voice, label) => chunks(txt, 220).forEach(c => segs.push({text: c, lang: voice ? voice.lang : lang, voice, label}));
   let missing = false;
+  // this hadith has no Urdu/Hindi yet: read the English so listening never stops silently
+  const enFallback = () => { const [v, ok] = pickVoice('en'); const r = tx(id,'en'); if (ok && r) { add(r[1], 'en-GB', v, t('mEnglish') + ' · ' + t('lHadith')); if (S.set.lMean) add(r[2], 'en-GB', v, t('mEnglish') + ' · ' + t('lMeaning')); } };
   for (const p of S.set.lMode.split('+')) {
     if (p === 'ar') { const [v, ok] = pickVoice('ar'); if (!ok) { missing = true; continue; } if (!tx(id,'ar')) continue; add(tx(id,'ar')[1], 'ar-SA', v, t('mArabic') + ' · ' + t('lHadith')); }
     if (p === 'en') { const [v, ok] = pickVoice('en'); const r = tx(id,'en'); if (!ok) { missing = true; continue; }
@@ -992,7 +996,7 @@ function segsFor(id){
       const vu = VOICES.length ? voiceFor('ur') : null; const [vh, okh] = pickVoice('hi');
       if (vu && D.ur && tx(id,'ur')) { const r = tx(id,'ur'); add(r[1], 'ur-PK', vu, 'اردو · ' + t('lHadith')); if (S.set.lMean) add(r[2], 'ur-PK', vu, 'اردو · ' + t('lMeaning')); }
       else if (okh) {
-        if (D.hd) { const r = D.hd[id]; if (r) { add(r[1], 'hi-IN', vh, 'Hindi · ' + t('lHadith')); if (S.set.lMean) add(r[2], 'hi-IN', vh, 'Hindi · ' + t('lMeaning')); } }
+        if (D.hd) { const r = D.hd[id]; if (r) { add(r[1], 'hi-IN', vh, 'Hindi · ' + t('lHadith')); if (S.set.lMean) add(r[2], 'hi-IN', vh, 'Hindi · ' + t('lMeaning')); } else enFallback(); }
         else segs.push({need: 'hd', id, label: 'Hindi · ' + t('lHadith')});
       } else missing = true;
     }
@@ -1022,7 +1026,7 @@ function speakNext(tok){
   if (sg.need === 'hd') {
     playerBar();
     getJSON('hd').then(d => { D.hd = d; if (tok !== PL.tok) return;
-      const rest = segsFor(PL.id).filter(x => x.label.startsWith('Hindi') || x.need);
+      const rest = segsFor(PL.id).filter(x => !String(x.lang || '').startsWith('ar'));
       PL.segs.splice(PL.i, 1, ...rest.filter(x => !x.need)); speakNext(tok); }).catch(() => { PL.i++; speakNext(tok); });
     return;
   }

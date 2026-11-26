@@ -26,7 +26,7 @@ WORDS = {
     'है': 'hai', 'हैं': 'hain', 'में': 'mein', 'नहीं': 'nahin', 'यह': 'yeh', 'वह': 'woh', 'कहा': 'kaha',
     'और': 'aur', 'कि': 'ki', 'की': 'ki', 'भी': 'bhi', 'ही': 'hi', 'जी': 'ji', 'तो': 'to', 'पर': 'par',
     'जन्नत': 'Jannat', 'जहन्नम': 'Jahannam', 'रमज़ान': 'Ramzan', 'नमाज़': 'namaz', 'ज़कात': 'zakat',
-    'हज': 'Hajj', 'उमरा': 'Umrah', 'जिब्रील': 'Jibreel', 'बुख़ारी': 'Bukhari', 'मुस्लिम': 'Muslim',
+    'हज': 'Hajj', 'एवं': 'evam', 'अथवा': 'athva', 'उमरा': 'Umrah', 'जिब्रील': 'Jibreel', 'बुख़ारी': 'Bukhari', 'मुस्लिम': 'Muslim',
 }
 
 
@@ -58,7 +58,18 @@ def syllables(word):
             units.append(['', 'n', False, 'nasal'])
             i += 1
         elif ch == VISARGA:
-            units.append(['', 'h', False, 'nasal'])
+            # after a vowel sign the source uses ः as a colon (कहाः = "kaha:"); after a bare consonant it is "h" (अतः = atah)
+            prev = units[-1] if units else None
+            if prev and len(prev) == 3 and not prev[2] and prev[1]:
+                units.append([':', '', False, 'other'])
+            else:
+                units.append(['', 'h', False, 'nasal'])
+            i += 1
+        elif ch in MATRA or ch in (VIRAMA, NUK):
+            # stray sign with no consonant before it (a typing slip in the source): nothing to pronounce
+            i += 1
+        elif ch == '\u097d':
+            units.append(['?', '', False, 'other'])
             i += 1
         else:
             units.append([ch, '', False, 'other'])
@@ -79,7 +90,7 @@ def roman_word(word):
     real = [k for k, x in enumerate(u) if len(x) == 3]
     if real:
         last = real[-1]
-        followed_by_visarga = last + 1 < len(u) and len(u[last + 1]) == 4 and u[last + 1][1] == 'h'
+        followed_by_visarga = last + 1 < len(u) and len(u[last + 1]) == 4 and u[last + 1][3] == 'nasal'
         if u[last][2] and len(real) > 1 and not followed_by_visarga:
             u[last][1] = ''
             u[last][2] = False
@@ -102,13 +113,17 @@ def roman_word(word):
     for k in range(1, len(u)):
         if len(u[k]) == 3 and u[k][0] == '' and u[k][1] == 'e' and len(u[k-1]) == 3 and u[k-1][1] in ('i', 'ee', 'aa'):
             u[k][1] = 'ye'
+    if len(u) >= 2 and len(u[-1]) == 4 and u[-1][3] == 'nasal' and u[-1][1] == 'n' and len(u[-2]) == 3 and u[-2][2]:
+        u[-1][1] = 'm'
     out = ''.join(x[0] + x[1] for x in u)
     # Hinglish spelling habits
     out = re.sub(r'ee$', 'i', out)          # ki, bhi, nabi
     out = re.sub(r'oo$', 'u', out)          # tu, hu
-    out = re.sub(r'aa$', 'a', out)          # ka, tha, milega
+    out = re.sub(r'aa(?=:?$)', 'a', out)    # ka, tha, milega, kaha:
     out = re.sub(r'aay', 'ay', out)          # farmaya, kiya, liya
     out = out.replace('llaah', 'llah')       # Bismillah, Insha'Allah
+    out = re.sub(r'(a)(aa)(?=[^a]|$)', r"\1'\2", out) if 'aaa' in out else out   # ta'aala, jama'aat
+    out = out.replace('eee', "ee'e").replace('ooo', "oo'o").replace('iii', "ii'i")
     out = re.sub(r'^chaahiye$', 'chahiye', out)
     return out
 

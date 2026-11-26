@@ -43,12 +43,16 @@ api = {str(x['id']): x for x in json.load(open(os.path.join(SRC, 'source/api/had
 BOOKS_AR = [('b', 'البخاري'), ('m', 'مسلم'), ('d', 'أبو داود'), ('t', 'الترمذي'), ('n', 'النسائي'), ('i', 'ابن ماجه'), ('k', 'مالك'), ('a', 'أحمد')]
 
 
-NOT_MAIN = re.compile(r'البخاري في (الأدب المفرد|خلق أفعال العباد|التاريخ الكبير)|النسائي في (السنن )?الكبرى')
+NOT_MAIN = re.compile(r'البخاري في (الأدب المفرد|خلق أفعال العباد|التاريخ الكبير)|النسائي (فرواه )?(في )?(السنن )?الكبرى|أبو داود الطيالسي')
+# "its origin is in ..." and Bukhari's suspended (mu'allaq) mentions are not narrations by that book
+ORIGIN = re.compile(r'و?أصل(ه|ها)?\s*(الحديث)?\s*(في|عند)\s+(صحيح\s+)?\S+')
+MUALLAQ = re.compile(r'(وذكره|ورواه|وروى|روى|رواه)?\s*البخاري\s+(في\s+صحيحه\s+)?(معل\S*|تعليق\S*)(\s+بصيغة\s+الجزم|\s+مجزوم\S*\s+به)?')
 
 
 def books_of(tk):
-    tk = (tk or '').split('تنبيه')[0]
-    tk = re.sub(r'[^،,\n]*(تعليق|أصله)[^،,\n]*', '', tk)   # suspended (mu'allaq) mentions or "its origin is in..."
+    tk = re.sub(r'[\u064B-\u065F\u0670]', '', tk or '').split('تنبيه')[0]
+    tk = ORIGIN.sub(' ', tk)
+    tk = MUALLAQ.sub(' ', tk)
     tk = NOT_MAIN.sub('', tk)
     found = set()
     if 'متفق عليه' in tk:
@@ -69,8 +73,12 @@ def grade_class(g):
         return 'sahih'
     if g.startswith('حسن') or g.startswith('إسناده حسن') or 'حديث حسن' in g or 'بإسناد حسن' in g:
         return 'hasan'
-    if 'حديث صحيح' in g or 'بإسناد صحيح' in g:
+    if 'حديث صحيح' in g or 'بإسناد صحيح' in g or g.startswith('صححه'):
         return 'sahih'
+    # several hadith graded one by one ("حديث فلان: صحيح. حديث فلان: حسن"): the lower grade applies
+    parts = re.findall(r'(صحيح|حسن)', g)
+    if g.startswith('حديث') and parts:
+        return 'hasan' if 'حسن' in parts else 'sahih'
     return None
 
 
